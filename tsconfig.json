@@ -1,4 +1,4 @@
-// Based on https://www.totaltypescript.com/tsconfig-cheat-sheet
+/* Based on https://www.totaltypescript.com/tsconfig-cheat-sheet */
 {
   "compilerOptions": {
     /* Base Options: */
@@ -15,20 +15,25 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
 
     /* If transpiling with TypeScript: */
-    "module": "NodeNext",
+    "module": "ESNext",
     "outDir": "dist",
     "sourceMap": true,
 
     /* If your code runs in the DOM: */
     "lib": ["es2022", "dom", "dom.iterable"],
 
-    // For Vite
+    /* For Vite */
+    "moduleResolution": "bundler",
     "types": ["vite/client"],
     "useDefineForClassFields": true,
 
-    // For React
+    /* For React */
     "jsx": "react-jsx"
   }
 }
