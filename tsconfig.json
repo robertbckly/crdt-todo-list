@@ -30,7 +30,7 @@
 
     /* For Vite */
     "moduleResolution": "bundler",
-    "types": ["vite/client"],
+    "types": ["vite/client", "google.accounts"],
     "useDefineForClassFields": true,
 
     /* For React */

@@ -12,5 +12,5 @@ root.render(
       <Route path={ROUTES.login} element={<Login />} />
       <Route path="*" element="Not found" />
     </Routes>
-  </BrowserRouter>
+  </BrowserRouter>,
 );
