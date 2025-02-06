@@ -3,28 +3,43 @@ import { Button } from '../../../lib/button';
 import { ItemInput } from './item-input';
 import { ItemText } from './item-text';
 
+type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
+// type ButtonAttributes = React.ButtonHTMLAttributes<HTMLButtonElement>;
+
 type Props = {
   value: string;
-  onChange: React.InputHTMLAttributes<HTMLInputElement>['onChange'];
+  isLastInList?: boolean;
+  onEdit: InputAttributes['onChange'];
+  onDelete: () => void;
 };
 
-export const Item = ({ value, onChange }: Props) => {
+export const Item = ({ value, isLastInList, onEdit, onDelete }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
+
+  const startEdit = () => setIsEditing(true);
+  const endEdit = () => setIsEditing(false);
+
+  const handleKeyDown: InputAttributes['onKeyDown'] = (e) => {
+    if (e.key === 'Escape' || e.key === 'Enter') {
+      endEdit();
+    }
+  };
+
   return (
-    <li className="flex gap-2 border-b pb-2">
+    <li className={`flex gap-2 ${!isLastInList ? 'border-b pb-2' : ''}`}>
       {isEditing ? (
         <ItemInput
           value={value}
-          onChange={onChange}
           autoFocus
-          onBlur={() => setIsEditing(false)}
+          onChange={onEdit}
+          onBlur={endEdit}
+          onKeyDown={handleKeyDown}
         />
       ) : (
         <ItemText>{value}</ItemText>
       )}
-      <Button onClick={() => setIsEditing(!isEditing)}>
-        {isEditing ? 'Done' : 'Edit'}
-      </Button>
+      {!isEditing && <Button onClick={startEdit}>Edit</Button>}
+      {!isEditing && <Button onClick={onDelete}>Delete</Button>}
     </li>
   );
 };

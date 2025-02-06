@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { ROUTES } from '../../../constants/routes';
 import { Link } from '../../lib/link';
 import { Item } from './item/item';
+import { ItemForm } from './item-form/item-form';
 
 export const App = () => {
   const [data, setData] = useState('');
+  console.log(data);
 
   // Testing...
   useEffect(() => {
@@ -26,41 +28,59 @@ export const App = () => {
         },
       });
       const parsedJson = await response.json();
-      console.log(parsedJson);
       if (!ignoreAsync) {
         setData(parsedJson.toString());
       }
     };
 
-    loadData();
+    loadData().catch(() => {});
     return () => {
       ignoreAsync = true;
     };
   }, []);
 
   const [items, setItems] = useState(['1', '2', '3']);
+  const haveItems = !!items.length;
 
-  console.log(items);
+  const handleCreate = (newValue: string) => {
+    const newItems = [...items];
+    newItems.unshift(newValue);
+    setItems(newItems);
+  };
 
-  const handleChange = (index: number, newValue: string) => {
+  const handleEdit = (index: number, newValue: string) => {
     const newItems = [...items];
     newItems[index] = newValue;
     setItems(newItems);
   };
 
+  const handleDelete = (index: number) => {
+    const newItems = [...items];
+    newItems.splice(index, 1);
+    setItems(newItems);
+  };
+
   return (
-    <main className="m-4">
+    <main className="m-4 max-w-md">
       <h1>Hello :-)</h1>
+
       {!data && <Link to={ROUTES.login}>Login</Link>}
-      {data && <p>{data}</p>}
-      <ul className="flex flex-col gap-2 border p-2">
-        {items.map((item, index) => (
-          <Item
-            value={item}
-            onChange={(event) => handleChange(index, event.target.value)}
-          />
-        ))}
-      </ul>
+
+      <div className="mt-2 flex flex-col gap-2 rounded border p-2">
+        <ItemForm onCreate={handleCreate} />
+        {haveItems && (
+          <ul aria-label="items" className="flex flex-col gap-2">
+            {items.map((item, index) => (
+              <Item
+                value={item}
+                isLastInList={index === items.length - 1}
+                onEdit={(event) => handleEdit(index, event.target.value)}
+                onDelete={() => handleDelete(index)}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
     </main>
   );
 };
