@@ -8,12 +8,19 @@ type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 
 type Props = {
   value: string;
+  disabled?: boolean;
   isLastInList?: boolean;
   onEdit: InputAttributes['onChange'];
   onDelete: () => void;
 };
 
-export const Item = ({ value, isLastInList, onEdit, onDelete }: Props) => {
+export const Item = ({
+  value,
+  disabled = false,
+  isLastInList = false,
+  onEdit,
+  onDelete,
+}: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const startEdit = () => setIsEditing(true);
@@ -30,6 +37,7 @@ export const Item = ({ value, isLastInList, onEdit, onDelete }: Props) => {
       {isEditing ? (
         <ItemInput
           value={value}
+          disabled={disabled}
           autoFocus
           onChange={onEdit}
           onBlur={endEdit}
@@ -38,8 +46,16 @@ export const Item = ({ value, isLastInList, onEdit, onDelete }: Props) => {
       ) : (
         <ItemText>{value}</ItemText>
       )}
-      {!isEditing && <Button onClick={startEdit}>Edit</Button>}
-      {!isEditing && <Button onClick={onDelete}>Delete</Button>}
+      {!isEditing && (
+        <Button onClick={startEdit} disabled={disabled}>
+          Edit
+        </Button>
+      )}
+      {!isEditing && (
+        <Button onClick={onDelete} disabled={disabled}>
+          Delete
+        </Button>
+      )}
     </li>
   );
 };

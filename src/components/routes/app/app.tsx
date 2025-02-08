@@ -1,78 +1,94 @@
-import { useEffect, useState } from 'react';
-import { ROUTES } from '../../../constants/routes';
-import { Link } from '../../lib/link';
 import { Item } from './item/item';
 import { ItemForm } from './item-form/item-form';
+import { Button } from '../../lib/button';
+import { useCrdt } from '../../../hooks/use-crdt';
+import { useSync } from '../../../hooks/use-sync';
+import { Link } from '../../lib/link';
+import { ROUTES } from '../../../constants/routes';
+import { useClientId } from '../../../hooks/use-client-id';
+import { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 
 export const App = () => {
-  const [data, setData] = useState('');
-  console.log(data);
+  const { clientId } = useClientId();
+  const {
+    crdt,
+    items,
+    counters,
+    haveItems,
+    hasInitialised,
+    setItems,
+    setCrdt,
+  } = useCrdt();
+  const { canSync, sync } = useSync();
 
-  // Testing...
+  const counter = clientId ? counters[clientId] : null;
+
+  // TODO: `canSync` shouldn't be required; will allow offline use
+  const isReady = clientId && canSync && typeof counter === 'number';
+
+  console.log(clientId, counters);
+
+  const [init, setInit] = useState(false);
+
   useEffect(() => {
-    const cookieString = document.cookie;
-    const cookies = cookieString.split(';').map((string) => string.trim());
-    const csrfToken =
-      cookies
-        .find((cookie) => cookie.startsWith('__Host-csrf='))
-        ?.split('__Host-csrf=')[1] || '';
-
-    let ignoreAsync = false;
-    const loadData = async () => {
-      const response = await fetch('/api', {
-        method: 'GET',
-        // body: JSON.stringify({ items: [1, 2, 3] }),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken,
-        },
-      });
-      const parsedJson = await response.json();
-      if (!ignoreAsync) {
-        setData(parsedJson.toString());
-      }
-    };
-
-    loadData().catch(() => {});
-    return () => {
-      ignoreAsync = true;
-    };
-  }, []);
-
-  const [items, setItems] = useState(['1', '2', '3']);
-  const haveItems = !!items.length;
+    if (init || !canSync || !hasInitialised) return;
+    sync({ crdt, setCrdt });
+    setInit(true);
+  }, [canSync, crdt, hasInitialised, init, setCrdt, sync]);
 
   const handleCreate = (newValue: string) => {
+    if (!isReady) return;
     const newItems = [...items];
-    newItems.unshift(newValue);
-    setItems(newItems);
+    newItems.unshift({
+      id: uuid(),
+      clientId,
+      counter: counter + 1,
+      value: newValue,
+      status: 'open',
+    });
+    setItems(newItems, true);
   };
 
   const handleEdit = (index: number, newValue: string) => {
+    if (!isReady) return;
+
     const newItems = [...items];
-    newItems[index] = newValue;
+    const item = newItems[index];
+    if (!item) return;
+
+    newItems[index] = { ...item, value: newValue };
     setItems(newItems);
   };
 
   const handleDelete = (index: number) => {
+    if (!isReady) return;
     const newItems = [...items];
     newItems.splice(index, 1);
     setItems(newItems);
   };
 
   return (
-    <main className="m-4 max-w-md">
-      <h1>Hello :-)</h1>
+    <main className="m-4 flex max-w-md flex-col gap-2">
+      {!canSync && <Link to={ROUTES.login}>Login</Link>}
 
-      {!data && <Link to={ROUTES.login}>Login</Link>}
+      <Button
+        disabled={!isReady}
+        onClick={() => sync({ crdt, setCrdt })}
+        className="self-end"
+      >
+        Sync
+      </Button>
 
       <div className="mt-2 flex flex-col gap-2 rounded border p-2">
-        <ItemForm onCreate={handleCreate} />
+        <ItemForm disabled={!isReady} onCreate={handleCreate} />
         {haveItems && (
           <ul aria-label="items" className="flex flex-col gap-2">
             {items.map((item, index) => (
               <Item
-                value={item}
+                key={item.id}
+                value={item.value}
+                disabled={!isReady}
                 isLastInList={index === items.length - 1}
                 onEdit={(event) => handleEdit(index, event.target.value)}
                 onDelete={() => handleDelete(index)}
