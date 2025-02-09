@@ -1,26 +1,26 @@
-import { API_ORIGIN, LOCAL_STORAGE_CRDT_KEY } from '../constants/config';
+import { API_ORIGIN } from '../constants/config';
 import { useCsrfToken } from './use-csrf-token';
 import { isCrdt } from '../utils/is-crdt';
 import { merge } from '../utils/merge';
 import type { CRDT } from '../types/crdt';
 
-type SyncParams = {
-  crdt: CRDT;
-  setCrdt: (crdt: CRDT) => void;
+type Params = {
+  updateLocalCrdt: (mergedCrdt: CRDT) => void;
 };
 
 type Return = {
-  canSync: boolean;
-  sync: (params: SyncParams) => Promise<void>;
+  isReady: boolean;
+  sync: (localCrdt: CRDT) => Promise<void>;
 };
 
-export const useSync = (): Return => {
+export const useSync = ({ updateLocalCrdt }: Params): Return => {
   const csrfToken = useCsrfToken();
-  const canSync = !!csrfToken;
+  const isReady = !!csrfToken;
 
-  const sync = async ({ crdt: localCrdt, setCrdt }: SyncParams) => {
-    if (!canSync) return;
+  const sync: Return['sync'] = async (localCrdt) => {
+    if (!isReady) return;
 
+    // Get remote CRDT
     const response = await fetch(API_ORIGIN, {
       method: 'GET',
       headers: {
@@ -29,19 +29,21 @@ export const useSync = (): Return => {
       },
     });
 
-    const remoteCrdt = await response.json();
-
-    let newCrdt: CRDT;
-    if (!isCrdt(remoteCrdt)) {
-      newCrdt = localCrdt;
-    } else {
-      console.log('merging', localCrdt);
-      newCrdt = merge(localCrdt, remoteCrdt);
+    // Parse
+    let remoteCrdt: unknown;
+    try {
+      remoteCrdt = await response.json();
+    } catch {
+      // Do nothing
     }
 
-    localStorage.setItem(LOCAL_STORAGE_CRDT_KEY, JSON.stringify(newCrdt));
-    setCrdt(newCrdt);
+    // Merge, or fallback to local CRDT
+    const newCrdt: CRDT = !isCrdt(remoteCrdt)
+      ? localCrdt
+      : merge(localCrdt, remoteCrdt);
+    updateLocalCrdt(newCrdt);
 
+    // Put remote CRDT
     await fetch(API_ORIGIN, {
       method: 'PUT',
       body: JSON.stringify(newCrdt),
@@ -53,7 +55,7 @@ export const useSync = (): Return => {
   };
 
   return {
-    canSync,
+    isReady,
     sync,
   } as const;
 };

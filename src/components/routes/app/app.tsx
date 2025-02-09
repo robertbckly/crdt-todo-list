@@ -2,20 +2,32 @@ import { Item } from './item/item';
 import { ItemForm } from './item-form/item-form';
 import { Button } from '../../lib/button';
 import { useData } from '../../../hooks/use-data';
-import { useSync } from '../../../hooks/use-sync';
 import { Link } from '../../lib/link';
 import { ROUTES } from '../../../constants/routes';
-import { useClientId } from '../../../hooks/use-client-id';
 import type { Item as TItem } from '../../../types/item';
+import { useEffect, useState } from 'react';
 
 export const App = () => {
-  const { clientId } = useClientId();
-  const { items, isReady, createItem, updateItem, deleteItem } = useData({
-    clientId,
-  });
-  const { canSync } = useSync();
+  const [doneInit, setDoneInit] = useState(false);
+  const {
+    items,
+    isReady,
+    isSyncReady,
+    createItem,
+    updateItem,
+    deleteItem,
+    sync,
+  } = useData();
 
-  const handleCreate = (value: string) => {
+  // Init: run sync when ready
+  useEffect(() => {
+    if (!doneInit && isSyncReady) {
+      sync();
+      setDoneInit(true);
+    }
+  }, [doneInit, isSyncReady, sync]);
+
+  const handleCreate = (value: TItem['value']) => {
     createItem({ value, status: 'open' });
   };
 
@@ -29,13 +41,11 @@ export const App = () => {
 
   return (
     <main className="m-4 flex max-w-md flex-col gap-2">
-      {!canSync && <Link to={ROUTES.login}>Login</Link>}
+      <Link to={ROUTES.login} className="self-start">
+        Login
+      </Link>
 
-      <Button
-        disabled={!isReady}
-        // onClick={() => sync({ crdt, setCrdt })}
-        className="self-end"
-      >
+      <Button disabled={!isSyncReady} onClick={sync} className="self-end">
         Sync
       </Button>
 

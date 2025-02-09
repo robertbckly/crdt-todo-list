@@ -1,28 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { LOCAL_STORAGE_CRDT_KEY } from '../constants/config';
 import { isCrdt } from '../utils/is-crdt';
+import { useSync } from './use-sync';
+import { useClientId } from './use-client-id';
 import type { CRDT } from '../types/crdt';
 import type { Item } from '../types/item';
-import type { ClientId } from '../types/client-id';
-
-type Params = {
-  clientId: ClientId;
-};
 
 type Return = {
   items: CRDT['items'];
   isReady: boolean;
+  isSyncReady: boolean;
   createItem: (item: Omit<Item, 'id' | 'clientId' | 'counter'>) => void;
   updateItem: (id: Item['id'], newValue: Item['value']) => void;
   deleteItem: (id: Item['id']) => void;
+  sync: () => void;
 };
 
-export const useData = ({ clientId }: Params): Return => {
+export const useData = (): Return => {
   const [doneInit, setDoneInit] = useState(false);
   const [crdt, setCrdt] = useState<CRDT>({ items: [], counters: {} });
+  const { clientId } = useClientId();
 
-  // TODO make sync part of this
+  const updateCrdt = useCallback((newCrdt: CRDT) => {
+    setCrdt(newCrdt);
+    localStorage.setItem(LOCAL_STORAGE_CRDT_KEY, JSON.stringify(newCrdt));
+  }, []);
+
+  const { isReady: isSyncReady, sync } = useSync({
+    updateLocalCrdt: updateCrdt,
+  });
+
+  const currentCounter = clientId ? crdt.counters[clientId] : null;
+  const isActionAllowed =
+    !!clientId && doneInit && typeof currentCounter === 'number';
 
   // Init: load CRDT from local storage
   useEffect(() => {
@@ -34,30 +45,25 @@ export const useData = ({ clientId }: Params): Return => {
     // If non-existent: create local-storage entry
     if (!localStorageEntry) {
       const newCrdt: CRDT = { items: [], counters: { [clientId]: 0 } };
-      localStorage.setItem(LOCAL_STORAGE_CRDT_KEY, JSON.stringify(newCrdt));
-      setCrdt(newCrdt);
+      updateCrdt(newCrdt);
       setDoneInit(true);
       return;
     }
 
     // Otherwise: parse, validate, then load into state
-    const existingCrdt = JSON.parse(localStorageEntry);
+    let existingCrdt: unknown;
+    try {
+      existingCrdt = JSON.parse(localStorageEntry);
+    } catch {
+      // Do nothing
+    }
     if (!isCrdt(existingCrdt)) return; // TODO: handle corruption
     setCrdt(existingCrdt);
     setDoneInit(true);
-  }, [clientId, crdt, doneInit]);
-
-  const updateCrdt = (newCrdt: CRDT) => {
-    setCrdt(newCrdt);
-    localStorage.setItem(LOCAL_STORAGE_CRDT_KEY, JSON.stringify(newCrdt));
-  };
+  }, [clientId, doneInit, updateCrdt]);
 
   const createItem: Return['createItem'] = (item) => {
-    if (!clientId) return;
-
-    const currentCounter = crdt.counters[clientId];
-    if (typeof currentCounter !== 'number') return;
-
+    if (!isActionAllowed) return;
     const newCounter = currentCounter + 1;
     const newCrdt = structuredClone(crdt);
     newCrdt.items.push({
@@ -71,23 +77,29 @@ export const useData = ({ clientId }: Params): Return => {
   };
 
   const updateItem: Return['updateItem'] = (id, newValue) => {
+    if (!isActionAllowed) return;
+
     const itemIndex = crdt.items.findIndex((item) => item.id === id);
     if (itemIndex === -1) {
       return;
     }
 
     const existingItem = crdt.items[itemIndex]!;
+    const newCounter = currentCounter + 1;
     const newCrdt = structuredClone(crdt);
     newCrdt.items.splice(itemIndex, 1, {
       ...existingItem,
       id: uuid(),
       value: newValue,
+      counter: newCounter,
     });
-
+    newCrdt.counters[clientId] = newCounter;
     updateCrdt(newCrdt);
   };
 
   const deleteItem: Return['deleteItem'] = (id) => {
+    if (!isActionAllowed) return;
+
     const itemIndex = crdt.items.findIndex((item) => item.id === id);
     if (itemIndex === -1) {
       return;
@@ -95,15 +107,16 @@ export const useData = ({ clientId }: Params): Return => {
 
     const newCrdt = structuredClone(crdt);
     newCrdt.items.splice(itemIndex, 1);
-
     updateCrdt(newCrdt);
   };
 
   return {
     items: crdt.items,
     isReady: doneInit,
+    isSyncReady: doneInit && isSyncReady,
     createItem,
     updateItem,
     deleteItem,
+    sync: () => sync(crdt),
   } as const;
 };
