@@ -40,16 +40,18 @@ export const App = () => {
   };
 
   return (
-    <main className="m-4 flex max-w-md flex-col gap-2">
-      <Link to={ROUTES.login} className="self-start">
-        Login
-      </Link>
+    <main className="mx-auto flex max-w-md flex-col gap-2 p-4">
+      {isSyncReady ? (
+        <Button onClick={sync} className="self-end">
+          Sync
+        </Button>
+      ) : (
+        <Link to={ROUTES.login} className="self-start">
+          Login
+        </Link>
+      )}
 
-      <Button disabled={!isSyncReady} onClick={sync} className="self-end">
-        Sync
-      </Button>
-
-      <div className="my-2 flex flex-col gap-2 rounded border p-2">
+      <div className="my-2 flex flex-col gap-2">
         <ItemForm disabled={!isReady} onCreate={handleCreate} />
         {!!items.length && (
           <ul aria-label="items" className="flex flex-col gap-2">

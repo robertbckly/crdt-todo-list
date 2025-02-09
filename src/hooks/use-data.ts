@@ -22,14 +22,12 @@ export const useData = (): Return => {
   const [crdt, setCrdt] = useState<CRDT>({ items: [], counters: {} });
   const { clientId } = useClientId();
 
-  const updateCrdt = useCallback((newCrdt: CRDT) => {
+  const updateLocalCrdt = useCallback((newCrdt: CRDT) => {
     setCrdt(newCrdt);
     localStorage.setItem(LOCAL_STORAGE_CRDT_KEY, JSON.stringify(newCrdt));
   }, []);
 
-  const { isReady: isSyncReady, sync } = useSync({
-    updateLocalCrdt: updateCrdt,
-  });
+  const { isReady: isSyncReady, sync } = useSync({ updateLocalCrdt });
 
   const currentCounter = clientId ? crdt.counters[clientId] : null;
   const isActionAllowed =
@@ -45,7 +43,7 @@ export const useData = (): Return => {
     // If non-existent: create local-storage entry
     if (!localStorageEntry) {
       const newCrdt: CRDT = { items: [], counters: { [clientId]: 0 } };
-      updateCrdt(newCrdt);
+      updateLocalCrdt(newCrdt);
       setDoneInit(true);
       return;
     }
@@ -60,7 +58,7 @@ export const useData = (): Return => {
     if (!isCrdt(existingCrdt)) return; // TODO: handle corruption
     setCrdt(existingCrdt);
     setDoneInit(true);
-  }, [clientId, doneInit, updateCrdt]);
+  }, [clientId, doneInit, updateLocalCrdt]);
 
   const createItem: Return['createItem'] = (item) => {
     if (!isActionAllowed) return;
@@ -73,7 +71,8 @@ export const useData = (): Return => {
       counter: newCounter,
     });
     newCrdt.counters[clientId] = newCounter;
-    updateCrdt(newCrdt);
+    updateLocalCrdt(newCrdt);
+    sync(newCrdt);
   };
 
   const updateItem: Return['updateItem'] = (id, newValue) => {
@@ -95,7 +94,8 @@ export const useData = (): Return => {
       value: newValue,
     });
     newCrdt.counters[clientId] = newCounter;
-    updateCrdt(newCrdt);
+    updateLocalCrdt(newCrdt);
+    sync(newCrdt);
   };
 
   const deleteItem: Return['deleteItem'] = (id) => {
@@ -108,7 +108,8 @@ export const useData = (): Return => {
 
     const newCrdt = structuredClone(crdt);
     newCrdt.items.splice(itemIndex, 1);
-    updateCrdt(newCrdt);
+    updateLocalCrdt(newCrdt);
+    sync(newCrdt);
   };
 
   return {
