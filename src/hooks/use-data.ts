@@ -90,8 +90,9 @@ export const useData = (): Return => {
     newCrdt.items.splice(itemIndex, 1, {
       ...existingItem,
       id: uuid(),
-      value: newValue,
+      clientId, // must overwrite as it's this client's counter being incremented
       counter: newCounter,
+      value: newValue,
     });
     newCrdt.counters[clientId] = newCounter;
     updateCrdt(newCrdt);
