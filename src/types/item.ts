@@ -1,9 +1,9 @@
 export type Item = {
-  // Below = required for CRDT
+  // Required properties for CRDT...
   id: string;
   clientId: string;
   counter: number;
-  // Below = arbitrary
+  // Arbitrary properties...
   value: string;
   status: 'open' | 'closed';
 };

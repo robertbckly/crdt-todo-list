@@ -37,6 +37,11 @@ export const useSync = ({ updateLocalCrdt }: Params): Return => {
       // Do nothing
     }
 
+    // TODO: below shouldn't put the local CRDT; remote should always
+    //       start with a blank CRDT... meaning failure to load or
+    //       validate remote is an error!
+    //       Can use stringified JSON constant in server config !
+
     // Merge, or fallback to local CRDT
     const newCrdt: CRDT = !isCrdt(remoteCrdt)
       ? localCrdt
