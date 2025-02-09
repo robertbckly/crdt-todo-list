@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LOCAL_STORAGE_CLIENT_ID_KEY } from '../constants/config';
 import { v4 as uuid } from 'uuid';
-
-type ClientId = string | null;
+import type { ClientId } from '../types/client-id';
 
 type Return = {
   clientId: ClientId;
