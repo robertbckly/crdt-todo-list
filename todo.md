@@ -1,0 +1,23 @@
+# To-do
+
+- truncation
+- multiline support
+- status changing
+- order persistence
+- reordering
+- markdown support?
+- multiple lists
+- session management
+- design
+- animations
+- dark mode toggle
+- motion toggle
+- a11y
+- efficiency review
+  - maybe commute changes; merge on server; compare hashes to know if to pull
+- max item size enforced before merge & server-side
+- local pagination
+- encryption
+- automatic session refreshing
+- graceful logout on invalid session
+- TODOs in code: i.e. remote CRDT errors

@@ -4,8 +4,8 @@ import { Button } from '../../lib/button';
 import { useData } from '../../../hooks/use-data';
 import { Link } from '../../lib/link';
 import { ROUTES } from '../../../constants/routes';
-import type { Item as TItem } from '../../../types/item';
 import { useEffect, useState } from 'react';
+import type { Item as TItem } from '../../../types/item';
 
 export const App = () => {
   const [doneInit, setDoneInit] = useState(false);

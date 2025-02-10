@@ -52,14 +52,14 @@ export const Item = ({
         <ItemText>{value}</ItemText>
       )}
       {!isEditing && (
-        <Button onClick={startEdit} disabled={disabled}>
-          Edit
-        </Button>
-      )}
-      {!isEditing && (
-        <Button onClick={onDelete} disabled={disabled}>
-          Delete
-        </Button>
+        <>
+          <Button onClick={startEdit} disabled={disabled}>
+            Edit
+          </Button>
+          <Button onClick={onDelete} disabled={disabled}>
+            Delete
+          </Button>
+        </>
       )}
     </li>
   );
