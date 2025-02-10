@@ -7,6 +7,7 @@
 - reordering
 - markdown support?
 - multiple lists
+  - within single CRDT; use list ID
 - session management
 - design
 - animations
@@ -15,6 +16,7 @@
 - a11y
 - efficiency review
   - maybe commute changes; merge on server; compare hashes to know if to pull
+  - could use IndexedDB API?
 - max item size enforced before merge & server-side
 - local pagination
 - encryption
