@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Button } from '../../../lib/button';
 import { ItemInput } from './item-input';
 import { ItemText } from './item-text';
 import { type Item as TItem } from '../../../../types/item';
+import { ItemDragHandle } from './item-drag-handle';
+import { DraggingContext } from '../../../../context/dragging-context';
+import { classnames } from '../../../../utils/classnames';
 
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
+type ListItemAttributes = React.HTMLAttributes<HTMLLIElement>;
 
 type Props = {
+  index: number;
   data: TItem;
   disabled?: boolean;
   isLastInList?: boolean;
@@ -15,6 +20,7 @@ type Props = {
 };
 
 export const Item = ({
+  index,
   data,
   disabled = false,
   isLastInList = false,
@@ -23,6 +29,7 @@ export const Item = ({
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
+  const { isDragging, setDraggingOverIndex } = useContext(DraggingContext);
 
   const startEdit = () => setIsEditing(true);
 
@@ -38,15 +45,34 @@ export const Item = ({
     });
   };
 
-  const handleKeyDown: InputAttributes['onKeyDown'] = (e) => {
+  const handleInputKeyDown: InputAttributes['onKeyDown'] = (e) => {
     if (e.key === 'Escape' || e.key === 'Enter') {
       endEdit();
     }
   };
 
+  const handleListItemPointerOver: ListItemAttributes['onPointerOver'] = (
+    e,
+  ) => {
+    if (!isDragging) {
+      return;
+    }
+    // Note: all positions are relative to viewport
+    const { top, height } = e.currentTarget.getBoundingClientRect();
+    const itemMidpoint = top + height / 2;
+    const mouseY = e.clientY;
+    // + 0.5 for bottom
+    const positionBasedIndex = mouseY <= itemMidpoint ? index : index + 0.5;
+    setDraggingOverIndex(positionBasedIndex);
+  };
+
   return (
     <li
-      className={`flex items-center gap-2 ${!isLastInList ? 'border-b pb-2' : ''}`}
+      onPointerOver={handleListItemPointerOver}
+      className={classnames(
+        'flex items-center gap-2 border-y-2 border-transparent py-2',
+        !isLastInList && 'border-b-2 border-b-black pb-2',
+      )}
     >
       {isEditing && (
         <ItemInput
@@ -54,28 +80,37 @@ export const Item = ({
           disabled={disabled}
           autoFocus
           onChange={(e) => setInputText(e.currentTarget.value)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleInputKeyDown}
           onBlur={endEdit}
         />
       )}
       {!isEditing && (
         <>
+          <ItemDragHandle
+            index={index}
+            onDrop={(from, to) => console.log(from, to)}
+          />
+
           <input
             type="checkbox"
             checked={data.status === 'closed'}
+            disabled={disabled}
             onChange={toggleStatus}
           />
+
           <ItemText
             className={`${data.status === 'closed' ? 'text-gray-500 line-through' : ''}`}
           >
             {data.text}
           </ItemText>
+
           <Button
             onClick={startEdit}
             disabled={disabled || data.status === 'closed'}
           >
             Edit
           </Button>
+
           <Button onClick={onDelete} disabled={disabled}>
             Delete
           </Button>
