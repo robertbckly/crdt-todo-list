@@ -1,19 +1,21 @@
 # To-do
 
-- truncation
+- ~~status updating~~
+- order updating & persistence
+- truncation via dialog: "item view"
 - multiline support
-- status changing
-- order persistence
-- reordering
 - markdown support?
 - multiple lists
   - within single CRDT; use list ID
+
+---
+
 - session management
 - design
 - animations
+- a11y
 - dark mode toggle
 - motion toggle
-- a11y
 - efficiency review
   - maybe commute changes; merge on server; compare hashes to know if to pull
   - could use IndexedDB API?

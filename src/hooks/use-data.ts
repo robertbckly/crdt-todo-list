@@ -11,8 +11,8 @@ type Return = {
   items: CRDT['items'];
   isReady: boolean;
   isSyncReady: boolean;
-  createItem: (item: Omit<Item, 'id' | 'clientId' | 'counter'>) => void;
-  updateItem: (id: Item['id'], newValue: Item['value']) => void;
+  createItem: (data: Pick<Item, 'text'>) => void;
+  updateItem: (updates: Omit<Item, 'clientId' | 'counter'>) => void;
   deleteItem: (id: Item['id']) => void;
   sync: () => void;
 };
@@ -60,25 +60,26 @@ export const useData = (): Return => {
     setDoneInit(true);
   }, [clientId, doneInit, updateLocalCrdt]);
 
-  const createItem: Return['createItem'] = (item) => {
+  const createItem: Return['createItem'] = (data) => {
     if (!isActionAllowed) return;
     const newCounter = currentCounter + 1;
     const newCrdt = structuredClone(crdt);
     newCrdt.items.push({
-      ...item,
+      ...data,
       id: uuid(),
       clientId,
       counter: newCounter,
+      status: 'open',
     });
     newCrdt.counters[clientId] = newCounter;
     updateLocalCrdt(newCrdt);
     sync(newCrdt);
   };
 
-  const updateItem: Return['updateItem'] = (id, newValue) => {
+  const updateItem: Return['updateItem'] = (updates) => {
     if (!isActionAllowed) return;
 
-    const itemIndex = crdt.items.findIndex((item) => item.id === id);
+    const itemIndex = crdt.items.findIndex((item) => item.id === updates.id);
     if (itemIndex === -1) {
       return;
     }
@@ -88,10 +89,10 @@ export const useData = (): Return => {
     const newCrdt = structuredClone(crdt);
     newCrdt.items.splice(itemIndex, 1, {
       ...existingItem,
+      ...updates,
       id: uuid(),
       clientId, // must overwrite as it's this client's counter being incremented
       counter: newCounter,
-      value: newValue,
     });
     newCrdt.counters[clientId] = newCounter;
     updateLocalCrdt(newCrdt);

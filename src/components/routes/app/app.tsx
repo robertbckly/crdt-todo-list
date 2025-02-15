@@ -27,12 +27,12 @@ export const App = () => {
     }
   }, [doneInit, isSyncReady, sync]);
 
-  const handleCreate = (value: TItem['value']) => {
-    createItem({ value, status: 'open' });
+  const handleCreate = (text: TItem['text']) => {
+    createItem({ text: text });
   };
 
-  const handleUpdate = (id: TItem['id'], newValue: TItem['value']) => {
-    updateItem(id, newValue);
+  const handleUpdate = (updates: TItem) => {
+    updateItem(updates);
   };
 
   const handleDelete = (id: TItem['id']) => {
@@ -58,10 +58,10 @@ export const App = () => {
             {items.map((item, index) => (
               <Item
                 key={item.id}
-                value={item.value}
+                data={item}
                 disabled={!isReady}
                 isLastInList={index === items.length - 1}
-                onUpdate={(newValue) => handleUpdate(item.id, newValue)}
+                onUpdate={handleUpdate}
                 onDelete={() => handleDelete(item.id)}
               />
             ))}

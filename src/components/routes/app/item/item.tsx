@@ -7,28 +7,35 @@ import { type Item as TItem } from '../../../../types/item';
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 
 type Props = {
-  value: string;
+  data: TItem;
   disabled?: boolean;
   isLastInList?: boolean;
-  onUpdate: (newValue: TItem['value']) => void;
+  onUpdate: (newData: TItem) => void;
   onDelete: () => void;
 };
 
 export const Item = ({
-  value,
+  data,
   disabled = false,
   isLastInList = false,
   onUpdate,
   onDelete,
 }: Props) => {
-  const [inputValue, setInputValue] = useState(value);
+  const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
 
   const startEdit = () => setIsEditing(true);
 
   const endEdit = () => {
-    onUpdate(inputValue);
+    onUpdate({ ...data, text: inputText });
     setIsEditing(false);
+  };
+
+  const toggleStatus = () => {
+    onUpdate({
+      ...data,
+      status: data.status === 'open' ? 'closed' : 'open',
+    });
   };
 
   const handleKeyDown: InputAttributes['onKeyDown'] = (e) => {
@@ -38,22 +45,35 @@ export const Item = ({
   };
 
   return (
-    <li className={`flex gap-2 ${!isLastInList ? 'border-b pb-2' : ''}`}>
-      {isEditing ? (
+    <li
+      className={`flex items-center gap-2 ${!isLastInList ? 'border-b pb-2' : ''}`}
+    >
+      {isEditing && (
         <ItemInput
-          value={inputValue}
+          value={inputText}
           disabled={disabled}
           autoFocus
-          onChange={(e) => setInputValue(e.currentTarget.value)}
+          onChange={(e) => setInputText(e.currentTarget.value)}
           onKeyDown={handleKeyDown}
           onBlur={endEdit}
         />
-      ) : (
-        <ItemText>{value}</ItemText>
       )}
       {!isEditing && (
         <>
-          <Button onClick={startEdit} disabled={disabled}>
+          <input
+            type="checkbox"
+            checked={data.status === 'closed'}
+            onChange={toggleStatus}
+          />
+          <ItemText
+            className={`${data.status === 'closed' ? 'text-gray-500 line-through' : ''}`}
+          >
+            {data.text}
+          </ItemText>
+          <Button
+            onClick={startEdit}
+            disabled={disabled || data.status === 'closed'}
+          >
             Edit
           </Button>
           <Button onClick={onDelete} disabled={disabled}>

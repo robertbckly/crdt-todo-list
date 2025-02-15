@@ -4,6 +4,6 @@ export type Item = {
   clientId: string;
   counter: number;
   // Arbitrary properties...
-  value: string;
+  text: string;
   status: 'open' | 'closed';
 };
