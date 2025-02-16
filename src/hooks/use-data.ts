@@ -71,6 +71,7 @@ export const useData = (): Return => {
       clientId,
       counter: newCounter,
       status: 'open',
+      order: newCrdt.items.length,
     });
     newCrdt.counters[clientId] = newCounter;
     updateLocalCrdt(newCrdt);
@@ -122,8 +123,15 @@ export const useData = (): Return => {
     }
     // Account for scenario of `to` being shifted when removing `from`
     const shiftOffset = to > from ? -1 : 0;
+    // Remove from old position
     newCrdt.items.splice(from, 1);
+    // Insert at new position
     newCrdt.items.splice(Math.max(to + shiftOffset, 0), 0, item);
+    // Update order for each item
+    newCrdt.items = newCrdt.items.map((item, index) => ({
+      ...item,
+      order: index,
+    }));
     updateLocalCrdt(newCrdt);
     sync(newCrdt);
   };

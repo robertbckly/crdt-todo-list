@@ -60,25 +60,27 @@ export const App = () => {
         {!!items.length && (
           <ul aria-label="items" className="flex flex-col">
             <ItemDropLine active={dropIndex === 0} />
-            {items.map((item, index) => (
-              <>
-                <Item
-                  key={item.id}
-                  index={index}
-                  data={item}
-                  disabled={!isReady || isDragging}
-                  isLastInList={index === items.length - 1}
-                  onUpdate={handleUpdate}
-                  onDelete={() => handleDelete(item.id)}
-                  onMove={moveItem}
-                />
-                <ItemDropLine
-                  key={`${item.id}-drop-line`}
-                  // Display beneath item before `dropIndex`
-                  active={index === dropIndex - 1}
-                />
-              </>
-            ))}
+            {items
+              .sort((a, b) => a.order - b.order)
+              .map((item, index) => (
+                <>
+                  <Item
+                    key={item.id}
+                    index={index}
+                    data={item}
+                    disabled={!isReady || isDragging}
+                    isLastInList={index === items.length - 1}
+                    onUpdate={handleUpdate}
+                    onDelete={() => handleDelete(item.id)}
+                    onMove={moveItem}
+                  />
+                  <ItemDropLine
+                    key={`${item.id}-drop-line`}
+                    // Display beneath item before `dropIndex`
+                    active={index === dropIndex - 1}
+                  />
+                </>
+              ))}
           </ul>
         )}
       </div>

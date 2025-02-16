@@ -6,4 +6,5 @@ export type Item = {
   // Arbitrary properties...
   text: string;
   status: 'open' | 'closed';
+  order: number;
 };
