@@ -55,7 +55,8 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
   const handleKeyDown: ButtonAttributes['onKeyDown'] = (e) => {
     switch (e.key) {
       case ' ':
-        startDragging('keyboard', index);
+        if (!isDragging) startDragging('keyboard', index);
+        if (isDragging) handleStop();
         break;
       case 'Enter':
       case 'Escape':

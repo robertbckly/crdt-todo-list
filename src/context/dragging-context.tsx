@@ -51,7 +51,9 @@ export const DraggingContextProvider = ({ children }: PropsWithChildren) => {
       setDragType(type);
       setDragIndex(index);
       setDropIndex(index);
-      setDropLineIndex(index * 2); // account for each item having two drop-line indices
+      // Pre-set drop-line index for keyboard, accounting for
+      // each item having two drop-line indices
+      setDropLineIndex(index * 2);
     },
     stopDragging: () => {
       setIsDragging(false);
