@@ -4,7 +4,7 @@ import { Button } from '../../lib/button';
 import { useData } from '../../../hooks/use-data';
 import { Link } from '../../lib/link';
 import { ROUTES } from '../../../constants/routes';
-import { useContext, useEffect, useState } from 'react';
+import { Fragment, useContext, useEffect, useState } from 'react';
 import { DraggingContext } from '../../../context/dragging-context';
 import type { Item as TItem } from '../../../types/item';
 import { ItemDropLine } from './item/item-drop-line';
@@ -58,14 +58,13 @@ export const App = () => {
       <div className="my-2 flex flex-col gap-2">
         <ItemForm disabled={!isReady} onCreate={handleCreate} />
         {!!items.length && (
-          <ul aria-label="items" className="flex flex-col">
+          <ul aria-label="items" className="flex flex-col rounded border px-2">
             <ItemDropLine active={dropIndex === 0} />
             {items
               .sort((a, b) => a.order - b.order)
               .map((item, index) => (
-                <>
+                <Fragment key={item.id}>
                   <Item
-                    key={item.id}
                     index={index}
                     data={item}
                     disabled={!isReady || isDragging}
@@ -75,11 +74,10 @@ export const App = () => {
                     onMove={moveItem}
                   />
                   <ItemDropLine
-                    key={`${item.id}-drop-line`}
                     // Display beneath item before `dropIndex`
                     active={index === dropIndex - 1}
                   />
-                </>
+                </Fragment>
               ))}
           </ul>
         )}

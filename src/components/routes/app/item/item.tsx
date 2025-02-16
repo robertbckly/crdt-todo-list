@@ -31,7 +31,7 @@ export const Item = ({
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
-  const { isDragging, setDropLineIndex: setDropIndex } = useContext(DraggingContext);
+  const { isDragging, setDropLineIndex } = useContext(DraggingContext);
 
   const startEdit = () => setIsEditing(true);
 
@@ -53,7 +53,7 @@ export const Item = ({
     }
   };
 
-  const handleListItemPointerOver: ListItemAttributes['onPointerOver'] = (
+  const handleListItemPointerMove: ListItemAttributes['onPointerMove'] = (
     e,
   ) => {
     if (!isDragging) return;
@@ -64,15 +64,15 @@ export const Item = ({
     // Each item gets index & index + 1 without overlap between items,
     // representing above and below the item
     const topBottomOffset = mouseY <= itemMidpoint ? 0 : 1;
-    setDropIndex(index * 2 + topBottomOffset);
+    setDropLineIndex(index * 2 + topBottomOffset);
   };
 
   return (
     <li
-      onPointerOver={handleListItemPointerOver}
+      onPointerMove={handleListItemPointerMove}
       className={classnames(
         'flex items-center gap-2 border-y-2 border-transparent py-2',
-        !isLastInList && 'border-b-2 border-b-black pb-2',
+        !isLastInList && 'border-b border-b-black pb-2',
       )}
     >
       {isEditing && (
