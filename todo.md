@@ -1,7 +1,10 @@
 # To-do
 
 - ~~status updating~~
-- order updating & persistence
+- ~~order updating & persistence~~
+- continue drag updates out of list's bounds (body?)
+- delay before drag start via touch
+- auto-scroll on drag
 - truncation via dialog: "item view"
 - multiline support
 - markdown support?
