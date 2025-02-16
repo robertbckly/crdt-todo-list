@@ -22,8 +22,8 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
   } = useContext(DraggingContext);
 
   const handlePointerDown: ButtonAttributes['onPointerDown'] = (e) => {
-    startDragging('pointer', index);
     e.currentTarget.releasePointerCapture(e.pointerId);
+    startDragging('pointer', index);
   };
 
   const handleStop = useCallback(() => {
@@ -80,6 +80,7 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
         isDragging && index === dragIndex ? 'opacity-100' : 'opacity-50',
       )}
       onPointerDown={handlePointerDown}
+      onPointerCancel={handleStop}
       onKeyDown={handleKeyDown}
     />
   );
