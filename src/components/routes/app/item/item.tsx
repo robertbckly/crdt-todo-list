@@ -17,6 +17,7 @@ type Props = {
   isLastInList?: boolean;
   onUpdate: (newData: TItem) => void;
   onDelete: () => void;
+  onMove: (from: number, to: number) => void;
 };
 
 export const Item = ({
@@ -26,10 +27,11 @@ export const Item = ({
   isLastInList = false,
   onUpdate,
   onDelete,
+  onMove,
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
-  const { isDragging, setDraggingOverIndex } = useContext(DraggingContext);
+  const { isDragging, setDropLineIndex: setDropIndex } = useContext(DraggingContext);
 
   const startEdit = () => setIsEditing(true);
 
@@ -54,16 +56,15 @@ export const Item = ({
   const handleListItemPointerOver: ListItemAttributes['onPointerOver'] = (
     e,
   ) => {
-    if (!isDragging) {
-      return;
-    }
+    if (!isDragging) return;
     // Note: all positions are relative to viewport
     const { top, height } = e.currentTarget.getBoundingClientRect();
     const itemMidpoint = top + height / 2;
     const mouseY = e.clientY;
-    // + 0.5 for bottom
-    const positionBasedIndex = mouseY <= itemMidpoint ? index : index + 0.5;
-    setDraggingOverIndex(positionBasedIndex);
+    // Each item gets index & index + 1 without overlap between items,
+    // representing above and below the item
+    const topBottomOffset = mouseY <= itemMidpoint ? 0 : 1;
+    setDropIndex(index * 2 + topBottomOffset);
   };
 
   return (
@@ -86,10 +87,7 @@ export const Item = ({
       )}
       {!isEditing && (
         <>
-          <ItemDragHandle
-            index={index}
-            onDrop={(from, to) => console.log(from, to)}
-          />
+          <ItemDragHandle index={index} onDrop={onMove} />
 
           <input
             type="checkbox"

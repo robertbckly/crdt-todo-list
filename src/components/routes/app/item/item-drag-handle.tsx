@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { DraggingContext } from '../../../../context/dragging-context';
 import { classnames } from '../../../../utils/classnames';
 
@@ -12,12 +12,13 @@ type Props = {
 export const ItemDragHandle = ({ index, onDrop }: Props) => {
   const {
     isDragging,
-    draggingType,
-    draggingIndex,
-    draggingOverIndex,
+    dragType,
+    dragIndex,
+    dropIndex,
+    dropLineIndex,
     startDragging,
     stopDragging,
-    setDraggingOverIndex,
+    setDropLineIndex,
   } = useContext(DraggingContext);
 
   const handlePointerDown: ButtonAttributes['onPointerDown'] = (e) => {
@@ -25,15 +26,16 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
     e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
+  const handleStop = useCallback(() => {
+    stopDragging();
+    onDrop(dragIndex, dropIndex);
+  }, [dragIndex, dropIndex, onDrop, stopDragging]);
+
   // Handle stop dragging
   useEffect(() => {
-    const stop = () => {
-      stopDragging();
-      onDrop(draggingIndex, Math.ceil(draggingOverIndex));
-    };
-    document.body.addEventListener('pointerup', stop);
-    return () => document.body.removeEventListener('pointerup', stop);
-  }, [draggingIndex, draggingOverIndex, onDrop, stopDragging]);
+    document.body.addEventListener('pointerup', handleStop);
+    return () => document.body.removeEventListener('pointerup', handleStop);
+  }, [handleStop]);
 
   // Handle document stuff while dragging
   useEffect(() => {
@@ -55,16 +57,17 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
       case ' ':
         startDragging('keyboard', index);
         break;
+      case 'Enter':
       case 'Escape':
-        stopDragging();
+        handleStop();
         break;
       case 'ArrowUp':
-        if (draggingType !== 'keyboard' || !draggingOverIndex) break;
-        setDraggingOverIndex(draggingOverIndex - 0.5);
+        if (dragType !== 'keyboard') break;
+        setDropLineIndex(dropLineIndex - 2);
         break;
       case 'ArrowDown':
-        if (draggingType !== 'keyboard' || !draggingOverIndex) break;
-        setDraggingOverIndex(draggingOverIndex + 0.5);
+        if (dragType !== 'keyboard') break;
+        setDropLineIndex(dropLineIndex + 2);
         break;
     }
   };
@@ -73,7 +76,7 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
     <button
       className={classnames(
         'h-8 w-8 shrink-0 cursor-pointer rounded bg-black active:cursor-grabbing',
-        isDragging && index === draggingIndex ? 'opacity-100' : 'opacity-50',
+        isDragging && index === dragIndex ? 'opacity-100' : 'opacity-50',
       )}
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}

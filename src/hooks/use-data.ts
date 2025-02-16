@@ -14,6 +14,7 @@ type Return = {
   createItem: (data: Pick<Item, 'text'>) => void;
   updateItem: (updates: Omit<Item, 'clientId' | 'counter'>) => void;
   deleteItem: (id: Item['id']) => void;
+  moveItem: (from: number, to: number) => void;
   sync: () => void;
 };
 
@@ -113,6 +114,20 @@ export const useData = (): Return => {
     sync(newCrdt);
   };
 
+  const moveItem: Return['moveItem'] = (from, to) => {
+    const newCrdt = structuredClone(crdt);
+    const item = newCrdt.items[from];
+    if (!item) {
+      return;
+    }
+    // Account for scenario of `to` being shifted when removing `from`
+    const shiftOffset = to > from ? -1 : 0;
+    newCrdt.items.splice(from, 1);
+    newCrdt.items.splice(Math.max(to + shiftOffset, 0), 0, item);
+    updateLocalCrdt(newCrdt);
+    sync(newCrdt);
+  };
+
   return {
     items: crdt.items,
     isReady: doneInit,
@@ -120,6 +135,7 @@ export const useData = (): Return => {
     createItem,
     updateItem,
     deleteItem,
+    moveItem,
     sync: () => sync(crdt),
   } as const;
 };

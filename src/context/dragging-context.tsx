@@ -1,52 +1,66 @@
 import { createContext, useState, type PropsWithChildren } from 'react';
 
-type DraggingType = 'pointer' | 'keyboard';
+type DragType = 'pointer' | 'keyboard';
 
 type DraggingContextValue = {
   isDragging: boolean;
-  draggingType: DraggingType | null;
-  draggingIndex: number;
-  draggingOverIndex: number;
-  startDragging: (type: DraggingType, index: number) => void;
+  dragType: DragType | null;
+  dragIndex: number;
+  dropIndex: number;
+  dropLineIndex: number;
+  startDragging: (type: DragType, index: number) => void;
   stopDragging: () => void;
-  setDraggingOverIndex: (index: number) => void;
+  setDropLineIndex: (index: number) => void;
   onDrop?: (from: number, to: number) => void;
 };
 
 export const DraggingContext = createContext<DraggingContextValue>({
   isDragging: false,
-  draggingType: null,
-  draggingIndex: -1,
-  draggingOverIndex: -1,
+  dragType: null,
+  dragIndex: -1,
+  dropIndex: -1,
+  dropLineIndex: -1,
   startDragging: () => {},
   stopDragging: () => {},
-  setDraggingOverIndex: () => {},
+  setDropLineIndex: () => {},
 });
 
 export const DraggingContextProvider = ({ children }: PropsWithChildren) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [draggingType, setDraggingType] = useState<DraggingType | null>(null);
-  const [draggingIndex, setDraggingIndex] = useState<number>(-1);
-  const [draggingOverIndex, setDraggingOverIndex] = useState<number>(-1);
+  const [dragType, setDragType] = useState<DragType | null>(null);
+  const [dragIndex, setDragIndex] = useState<number>(-1);
+  const [dropIndex, setDropIndex] = useState<number>(-1);
+  const [dropLineIndex, setDropLineIndex] = useState<number>(-1);
+
+  const handleDropLineChange: DraggingContextValue['setDropLineIndex'] = (
+    newLineIndex,
+  ) => {
+    // Note: each item has x2 drop-line indices, e.g. item-0 has 0 + 1; item-1 has 2 + 3
+    setDropLineIndex(newLineIndex);
+    setDropIndex(Math.ceil(newLineIndex / 2));
+  };
 
   const value: DraggingContextValue = {
     isDragging,
-    draggingType,
-    draggingIndex,
-    draggingOverIndex,
+    dragType,
+    dragIndex,
+    dropIndex,
+    dropLineIndex,
     startDragging: (type, index) => {
       setIsDragging(true);
-      setDraggingType(type);
-      setDraggingIndex(index);
-      setDraggingOverIndex(index);
+      setDragType(type);
+      setDragIndex(index);
+      setDropIndex(index);
+      setDropLineIndex(index * 2); // account for each item having two drop-line indices
     },
     stopDragging: () => {
       setIsDragging(false);
-      setDraggingType(null);
-      setDraggingIndex(-1);
-      setDraggingOverIndex(-1);
+      setDragType(null);
+      setDragIndex(-1);
+      setDropIndex(-1);
+      setDropLineIndex(-1);
     },
-    setDraggingOverIndex,
+    setDropLineIndex: handleDropLineChange,
   };
 
   return (

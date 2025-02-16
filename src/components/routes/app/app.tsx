@@ -18,9 +18,10 @@ export const App = () => {
     createItem,
     updateItem,
     deleteItem,
+    moveItem,
     sync,
   } = useData();
-  const { isDragging, draggingOverIndex } = useContext(DraggingContext);
+  const { isDragging, dropIndex } = useContext(DraggingContext);
 
   // Init: run sync when ready
   useEffect(() => {
@@ -58,7 +59,7 @@ export const App = () => {
         <ItemForm disabled={!isReady} onCreate={handleCreate} />
         {!!items.length && (
           <ul aria-label="items" className="flex flex-col">
-            <ItemDropLine active={draggingOverIndex === 0} />
+            <ItemDropLine active={dropIndex === 0} />
             {items.map((item, index) => (
               <>
                 <Item
@@ -69,14 +70,12 @@ export const App = () => {
                   isLastInList={index === items.length - 1}
                   onUpdate={handleUpdate}
                   onDelete={() => handleDelete(item.id)}
+                  onMove={moveItem}
                 />
                 <ItemDropLine
                   key={`${item.id}-drop-line`}
-                  // TODO: make the drop indices less confusing
-                  active={
-                    index === draggingOverIndex - 0.5 ||
-                    index === draggingOverIndex - 1
-                  }
+                  // Display beneath item before `dropIndex`
+                  active={index === dropIndex - 1}
                 />
               </>
             ))}
