@@ -3,5 +3,5 @@
 :root,
 body,
 #root {
-  min-height: 100%;
+  min-height: 100dvh;
 }

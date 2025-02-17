@@ -3,6 +3,7 @@
 - ~~status updating~~
 - ~~order updating & persistence~~
 - ~~continue drag updates out of list's bounds~~
+- add bounds to keyboard reordering
 - delay before drag start via touch
 - auto-scroll on drag
 - truncation via dialog: "item view"
