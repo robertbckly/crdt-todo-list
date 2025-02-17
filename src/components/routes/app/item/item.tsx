@@ -6,6 +6,7 @@ import { type Item as TItem } from '../../../../types/item';
 import { ItemDragHandle } from './item-drag-handle';
 import { DraggingContext } from '../../../../context/dragging-context';
 import { classnames } from '../../../../utils/classnames';
+import { ItemHitBox } from './item-hit-box';
 
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 type ListItemAttributes = React.HTMLAttributes<HTMLLIElement>;
@@ -71,10 +72,12 @@ export const Item = ({
     <li
       onPointerMove={handleListItemPointerMove}
       className={classnames(
-        'flex items-center gap-2 border-y-2 border-transparent py-2',
+        'relative flex items-center gap-2 border-y-2 border-transparent py-2',
         !isLastInList && 'border-b border-b-black pb-2',
       )}
     >
+      {isDragging && <ItemHitBox />}
+
       {isEditing && (
         <ItemInput
           value={inputText}

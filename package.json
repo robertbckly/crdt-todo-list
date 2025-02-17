@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "vite",
-    "dev-lan": "vite --host --port 1234"
+    "host": "vite --host --port 1234"
   },
   "repository": {
     "type": "git",
