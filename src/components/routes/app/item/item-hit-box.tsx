@@ -23,7 +23,8 @@ export const ItemHitBox = () => {
     <div
       ref={hitBoxRef}
       style={{ left: `-${leftOffset}px` }}
-      className="absolute h-full w-dvw"
+      // As tall as item & as wide as viewport
+      className="absolute z-[1] h-full w-dvw"
     />
   );
 };
