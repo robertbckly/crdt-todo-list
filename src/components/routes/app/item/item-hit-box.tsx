@@ -13,8 +13,8 @@ export const ItemHitBox = () => {
       const hitBox = hitBoxRef.current;
       const parent = hitBox?.parentElement;
       if (!hitBox || !parent) return;
+      hitBox.style.width = `${document.documentElement.clientWidth}px`;
       hitBox.style.left = `-${parent.getBoundingClientRect().x || 0}px`;
-      hitBox.style.width = `${document.body.clientWidth}px`;
     };
     updateOffset();
     window.addEventListener('resize', updateOffset);
