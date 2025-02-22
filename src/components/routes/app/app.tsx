@@ -49,6 +49,7 @@ export const App = () => {
 
   return (
     <DraggingContextProvider
+      listLength={items.length}
       isDragging={isDragging}
       dropIndex={dropIndex}
       hitBoxParentRef={firstItemRef}

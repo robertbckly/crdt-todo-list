@@ -25,6 +25,7 @@ type DraggingContextValue = {
 };
 
 type DraggingContextProviderProps = PropsWithChildren<{
+  listLength: number;
   isDragging: boolean;
   dropIndex: number;
   hitBoxParentRef: RefObject<HTMLElement | null>;
@@ -49,6 +50,7 @@ export const DraggingContext = createContext<DraggingContextValue>({
 });
 
 export const DraggingContextProvider = ({
+  listLength,
   isDragging,
   dropIndex,
   hitBoxParentRef,
@@ -91,10 +93,13 @@ export const DraggingContextProvider = ({
         setDropLineIndex(index * 2);
       },
       stopDragging: reset,
-      updateDropLineIndex: (newLineIndex) => {
-        // Note: each item has x2 drop-line indices, e.g. item-0 has 0 + 1; item-1 has 2 + 3
-        setDropLineIndex(newLineIndex);
-        onDropIndexChange(Math.ceil(newLineIndex / 2));
+      updateDropLineIndex: (newDropLineIndex) => {
+        // Note: each item has x2 drop-line indices,
+        // e.g. item-0 has 0 + 1; item-1 has 2 + 3
+        const newDropIndex = Math.ceil(newDropLineIndex / 2);
+        if (newDropIndex < 0 || newDropIndex > listLength) return;
+        setDropLineIndex(newDropLineIndex);
+        onDropIndexChange(newDropIndex);
       },
       drop: () => {
         onDrop(dragIndex, dropIndex);
@@ -109,6 +114,7 @@ export const DraggingContextProvider = ({
       hitBoxOffset,
       hitBoxWidth,
       isDragging,
+      listLength,
       onDrop,
       onDropIndexChange,
       onStartDragging,
@@ -116,14 +122,14 @@ export const DraggingContextProvider = ({
     ],
   );
 
-  // Handle drop
+  // Handle pointer-based drop
   useEffect(() => {
     if (!isDragging || dragType !== 'pointer') return;
     document.body.addEventListener('pointerup', value.drop);
     return () => document.body.removeEventListener('pointerup', value.drop);
   }, [dragType, isDragging, value.drop]);
 
-  // Handle drag cancellation
+  // Handle pointer-based drag cancellation
   useEffect(() => {
     if (!isDragging || dragType !== 'pointer') return;
     document.body.addEventListener('pointerleave', reset);
