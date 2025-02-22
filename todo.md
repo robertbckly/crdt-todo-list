@@ -6,6 +6,7 @@
 - ~~add bounds to keyboard reordering~~
 - ~~delay before drag start via touch~~
 - auto-scroll on drag
+- review lack of use of HTML drag-and-drop API; impact on a11y, etc.
 - truncation via dialog: "item view"
 - multiline support
 - markdown support?
