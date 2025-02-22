@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -16,9 +17,18 @@ type DraggingContextValue = {
   dropLineIndex: number;
   startDragging: (type: DragType, index: number) => void;
   stopDragging: () => void;
-  setDropLineIndex: (index: number) => void;
-  onDrop?: (from: number, to: number) => void;
+  updateDropLineIndex: (index: number) => void;
+  drop: () => void;
 };
+
+type DraggingContextProviderProps = PropsWithChildren<{
+  isDragging: boolean;
+  dropIndex: number;
+  onStartDragging: () => void;
+  onStopDragging: () => void;
+  onDropIndexChange: (newIndex: number) => void;
+  onDrop: (from: number, to: number) => void;
+}>;
 
 export const DraggingContext = createContext<DraggingContextValue>({
   isDragging: false,
@@ -28,23 +38,30 @@ export const DraggingContext = createContext<DraggingContextValue>({
   dropLineIndex: -1,
   startDragging: () => {},
   stopDragging: () => {},
-  setDropLineIndex: () => {},
+  updateDropLineIndex: () => {},
+  drop: () => {},
 });
 
-export const DraggingContextProvider = ({ children }: PropsWithChildren) => {
-  const [isDragging, setIsDragging] = useState(false);
+export const DraggingContextProvider = ({
+  isDragging,
+  dropIndex,
+  children,
+  onStartDragging,
+  onStopDragging,
+  onDropIndexChange,
+  onDrop,
+}: DraggingContextProviderProps) => {
   const [dragType, setDragType] = useState<DragType | null>(null);
   const [dragIndex, setDragIndex] = useState<number>(-1);
-  const [dropIndex, setDropIndex] = useState<number>(-1);
   const [dropLineIndex, setDropLineIndex] = useState<number>(-1);
 
-  const handleDropLineChange: DraggingContextValue['setDropLineIndex'] = (
-    newLineIndex,
-  ) => {
-    // Note: each item has x2 drop-line indices, e.g. item-0 has 0 + 1; item-1 has 2 + 3
-    setDropLineIndex(newLineIndex);
-    setDropIndex(Math.ceil(newLineIndex / 2));
-  };
+  const reset = useCallback(() => {
+    onStopDragging();
+    setDragType(null);
+    setDragIndex(-1);
+    onDropIndexChange(-1);
+    setDropLineIndex(-1);
+  }, [onDropIndexChange, onStopDragging]);
 
   const value: DraggingContextValue = useMemo(
     () => ({
@@ -54,36 +71,68 @@ export const DraggingContextProvider = ({ children }: PropsWithChildren) => {
       dropIndex,
       dropLineIndex,
       startDragging: (type, index) => {
-        setIsDragging(true);
+        onStartDragging();
+        onDropIndexChange(index);
         setDragType(type);
         setDragIndex(index);
-        setDropIndex(index);
         // Pre-set drop-line index for keyboard, accounting for
         // each item having two drop-line indices
         setDropLineIndex(index * 2);
       },
-      stopDragging: () => {
-        setIsDragging(false);
-        setDragType(null);
-        setDragIndex(-1);
-        setDropIndex(-1);
-        setDropLineIndex(-1);
+      stopDragging: reset,
+      updateDropLineIndex: (newLineIndex) => {
+        // Note: each item has x2 drop-line indices, e.g. item-0 has 0 + 1; item-1 has 2 + 3
+        setDropLineIndex(newLineIndex);
+        onDropIndexChange(Math.ceil(newLineIndex / 2));
       },
-      setDropLineIndex: handleDropLineChange,
+      drop: () => {
+        onDrop(dragIndex, dropIndex);
+        reset();
+      },
     }),
-    [dragIndex, dragType, dropIndex, dropLineIndex, isDragging],
+    [
+      dragIndex,
+      dragType,
+      dropIndex,
+      dropLineIndex,
+      isDragging,
+      onDrop,
+      onDropIndexChange,
+      onStartDragging,
+      reset,
+    ],
   );
 
-  // Cancel dragging
+  // Handle drop
   useEffect(() => {
-    const cancel = () => value.stopDragging();
-    document.body.addEventListener('pointerup', cancel);
-    document.body.addEventListener('pointerleave', cancel);
+    if (!isDragging || dragType !== 'pointer') return;
+    document.body.addEventListener('pointerup', value.drop);
+    return () => document.body.removeEventListener('pointerup', value.drop);
+  }, [dragType, isDragging, value.drop]);
+
+  // Handle drag cancellation
+  useEffect(() => {
+    if (!isDragging || dragType !== 'pointer') return;
+    document.body.addEventListener('pointerleave', reset);
     return () => {
-      document.body.removeEventListener('pointerup', cancel);
-      document.body.removeEventListener('pointerleave', cancel);
+      document.body.removeEventListener('pointerleave', reset);
     };
-  }, [value]);
+  }, [dragType, isDragging, reset]);
+
+  // Handle quality-of-life stuff while dragging
+  useEffect(() => {
+    const preventDefault = (e: Event) => isDragging && e.preventDefault();
+    window.document.body.style.cursor =
+      isDragging && dragType === 'pointer' ? 'grabbing' : 'auto';
+    // Prevent mobile browsers allowing pull-to-refresh etc. while dragging
+    window.document.body.addEventListener('touchmove', preventDefault, {
+      passive: false,
+    });
+    return () => {
+      window.document.body.style.cursor = 'auto';
+      window.document.body.removeEventListener('touchmove', preventDefault);
+    };
+  }, [dragType, isDragging]);
 
   return (
     <DraggingContext.Provider value={value}>

@@ -4,13 +4,15 @@ import { Button } from '../../lib/button';
 import { useData } from '../../../hooks/use-data';
 import { Link } from '../../lib/link';
 import { ROUTES } from '../../../constants/routes';
-import { Fragment, useContext, useEffect, useState } from 'react';
-import { DraggingContext } from '../../../context/dragging-context';
-import type { Item as TItem } from '../../../types/item';
+import { Fragment, useEffect, useState } from 'react';
 import { ItemDropLine } from './item/item-drop-line';
+import { DraggingContextProvider } from '../../../context/dragging-context';
+import type { Item as TItem } from '../../../types/item';
 
 export const App = () => {
   const [doneInit, setDoneInit] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dropIndex, setDropIndex] = useState(-1);
   const {
     items,
     isReady,
@@ -21,7 +23,6 @@ export const App = () => {
     moveItem,
     sync,
   } = useData();
-  const { isDragging, dropIndex } = useContext(DraggingContext);
 
   // Init: run sync when ready
   useEffect(() => {
@@ -32,7 +33,7 @@ export const App = () => {
   }, [doneInit, isSyncReady, sync]);
 
   const handleCreate = (text: TItem['text']) => {
-    createItem({ text: text });
+    createItem({ text });
   };
 
   const handleUpdate = (updates: TItem) => {
@@ -44,44 +45,55 @@ export const App = () => {
   };
 
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-2 p-4">
-      {isSyncReady ? (
-        <Button onClick={sync} className="self-end">
-          Sync
-        </Button>
-      ) : (
-        <Link to={ROUTES.login} className="self-start">
-          Login
-        </Link>
-      )}
-
-      <div className="my-2 flex flex-col gap-2">
-        <ItemForm disabled={!isReady} onCreate={handleCreate} />
-        {!!items.length && (
-          <ul aria-label="items" className="flex flex-col rounded border px-2">
-            <ItemDropLine active={dropIndex === 0} />
-            {items
-              .sort((a, b) => a.order - b.order)
-              .map((item, index) => (
-                <Fragment key={item.id}>
-                  <Item
-                    index={index}
-                    data={item}
-                    disabled={!isReady || isDragging}
-                    isLastInList={index === items.length - 1}
-                    onUpdate={handleUpdate}
-                    onDelete={() => handleDelete(item.id)}
-                    onMove={moveItem}
-                  />
-                  <ItemDropLine
-                    // Display beneath item before `dropIndex`
-                    active={index === dropIndex - 1}
-                  />
-                </Fragment>
-              ))}
-          </ul>
+    <DraggingContextProvider
+      isDragging={isDragging}
+      dropIndex={dropIndex}
+      onStartDragging={() => setIsDragging(true)}
+      onStopDragging={() => setIsDragging(false)}
+      onDropIndexChange={setDropIndex}
+      onDrop={moveItem}
+    >
+      <main className="mx-auto flex max-w-md flex-col gap-2 p-4">
+        {isSyncReady ? (
+          <Button onClick={sync} className="self-end">
+            Sync
+          </Button>
+        ) : (
+          <Link to={ROUTES.login} className="self-start">
+            Login
+          </Link>
         )}
-      </div>
-    </main>
+
+        <div className="my-2 flex flex-col gap-2">
+          <ItemForm disabled={!isReady} onCreate={handleCreate} />
+          {!!items.length && (
+            <ul
+              aria-label="items"
+              className="flex flex-col rounded border px-2"
+            >
+              <ItemDropLine active={dropIndex === 0} />
+              {items
+                .sort((a, b) => a.order - b.order)
+                .map((item, index) => (
+                  <Fragment key={item.id}>
+                    <Item
+                      index={index}
+                      data={item}
+                      disabled={!isReady || isDragging}
+                      isLastInList={index === items.length - 1}
+                      onUpdate={handleUpdate}
+                      onDelete={() => handleDelete(item.id)}
+                    />
+                    <ItemDropLine
+                      // Display beneath item before `dropIndex`
+                      active={index === dropIndex - 1}
+                    />
+                  </Fragment>
+                ))}
+            </ul>
+          )}
+        </div>
+      </main>
+    </DraggingContextProvider>
   );
 };

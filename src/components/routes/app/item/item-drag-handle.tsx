@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { DraggingContext } from '../../../../context/dragging-context';
 import { classnames } from '../../../../utils/classnames';
 
@@ -6,19 +6,18 @@ type ButtonAttributes = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 type Props = {
   index: number;
-  onDrop: (fromIndex: number, toIndex: number) => void;
 };
 
-export const ItemDragHandle = ({ index, onDrop }: Props) => {
+export const ItemDragHandle = ({ index }: Props) => {
   const {
     isDragging,
     dragType,
     dragIndex,
-    dropIndex,
     dropLineIndex,
     startDragging,
     stopDragging,
-    setDropLineIndex,
+    updateDropLineIndex,
+    drop,
   } = useContext(DraggingContext);
 
   const handlePointerDown: ButtonAttributes['onPointerDown'] = (e) => {
@@ -26,49 +25,23 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
     startDragging('pointer', index);
   };
 
-  const handleStop = useCallback(() => {
-    stopDragging();
-    onDrop(dragIndex, dropIndex);
-  }, [dragIndex, dropIndex, onDrop, stopDragging]);
-
-  // Handle stop dragging
-  useEffect(() => {
-    document.body.addEventListener('pointerup', handleStop);
-    return () => document.body.removeEventListener('pointerup', handleStop);
-  }, [handleStop]);
-
-  // Handle document stuff while dragging
-  useEffect(() => {
-    const preventDefault = (e: Event) => isDragging && e.preventDefault();
-
-    window.document.body.style.cursor = isDragging ? 'grabbing' : 'auto';
-    window.document.body.addEventListener('touchmove', preventDefault, {
-      passive: false,
-    });
-
-    return () => {
-      window.document.body.style.cursor = 'auto';
-      window.document.body.removeEventListener('touchmove', preventDefault);
-    };
-  }, [isDragging]);
-
   const handleKeyDown: ButtonAttributes['onKeyDown'] = (e) => {
     switch (e.key) {
       case ' ':
-        if (!isDragging) startDragging('keyboard', index);
-        if (isDragging) handleStop();
-        break;
       case 'Enter':
+        if (!isDragging) startDragging('keyboard', index);
+        if (isDragging) drop();
+        break;
       case 'Escape':
-        handleStop();
+        stopDragging();
         break;
       case 'ArrowUp':
         if (dragType !== 'keyboard') break;
-        setDropLineIndex(dropLineIndex - 2);
+        updateDropLineIndex(dropLineIndex - 2);
         break;
       case 'ArrowDown':
         if (dragType !== 'keyboard') break;
-        setDropLineIndex(dropLineIndex + 2);
+        updateDropLineIndex(dropLineIndex + 2);
         break;
     }
   };
@@ -80,7 +53,6 @@ export const ItemDragHandle = ({ index, onDrop }: Props) => {
         isDragging && index === dragIndex ? 'opacity-100' : 'opacity-50',
       )}
       onPointerDown={handlePointerDown}
-      onPointerCancel={handleStop}
       onKeyDown={handleKeyDown}
     />
   );
