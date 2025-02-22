@@ -4,7 +4,7 @@ import { Button } from '../../lib/button';
 import { useData } from '../../../hooks/use-data';
 import { Link } from '../../lib/link';
 import { ROUTES } from '../../../constants/routes';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { ItemDropLine } from './item/item-drop-line';
 import { DraggingContextProvider } from '../../../context/dragging-context';
 import type { Item as TItem } from '../../../types/item';
@@ -23,6 +23,9 @@ export const App = () => {
     moveItem,
     sync,
   } = useData();
+
+  // First item is measured to determine hit-box width and offset
+  const firstItemRef = useRef<HTMLLIElement>(null);
 
   // Init: run sync when ready
   useEffect(() => {
@@ -48,6 +51,7 @@ export const App = () => {
     <DraggingContextProvider
       isDragging={isDragging}
       dropIndex={dropIndex}
+      hitBoxParentRef={firstItemRef}
       onStartDragging={() => setIsDragging(true)}
       onStopDragging={() => setIsDragging(false)}
       onDropIndexChange={setDropIndex}
@@ -77,6 +81,7 @@ export const App = () => {
                 .map((item, index) => (
                   <Fragment key={item.id}>
                     <Item
+                      ref={index === 0 ? firstItemRef : undefined}
                       index={index}
                       data={item}
                       disabled={!isReady || isDragging}

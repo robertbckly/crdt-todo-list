@@ -5,6 +5,7 @@ import {
   useMemo,
   useState,
   type PropsWithChildren,
+  type RefObject,
 } from 'react';
 
 type DragType = 'pointer' | 'keyboard';
@@ -15,6 +16,8 @@ type DraggingContextValue = {
   dragIndex: number;
   dropIndex: number;
   dropLineIndex: number;
+  hitBoxWidth: number;
+  hitBoxOffset: number;
   startDragging: (type: DragType, index: number) => void;
   stopDragging: () => void;
   updateDropLineIndex: (index: number) => void;
@@ -24,6 +27,7 @@ type DraggingContextValue = {
 type DraggingContextProviderProps = PropsWithChildren<{
   isDragging: boolean;
   dropIndex: number;
+  hitBoxParentRef: RefObject<HTMLElement | null>;
   onStartDragging: () => void;
   onStopDragging: () => void;
   onDropIndexChange: (newIndex: number) => void;
@@ -36,6 +40,8 @@ export const DraggingContext = createContext<DraggingContextValue>({
   dragIndex: -1,
   dropIndex: -1,
   dropLineIndex: -1,
+  hitBoxWidth: 0,
+  hitBoxOffset: 0,
   startDragging: () => {},
   stopDragging: () => {},
   updateDropLineIndex: () => {},
@@ -45,6 +51,7 @@ export const DraggingContext = createContext<DraggingContextValue>({
 export const DraggingContextProvider = ({
   isDragging,
   dropIndex,
+  hitBoxParentRef,
   children,
   onStartDragging,
   onStopDragging,
@@ -54,6 +61,8 @@ export const DraggingContextProvider = ({
   const [dragType, setDragType] = useState<DragType | null>(null);
   const [dragIndex, setDragIndex] = useState<number>(-1);
   const [dropLineIndex, setDropLineIndex] = useState<number>(-1);
+  const [hitBoxWidth, setHitBoxWidth] = useState(0);
+  const [hitBoxOffset, setHitBoxOffset] = useState(0);
 
   const reset = useCallback(() => {
     onStopDragging();
@@ -70,6 +79,8 @@ export const DraggingContextProvider = ({
       dragIndex,
       dropIndex,
       dropLineIndex,
+      hitBoxWidth,
+      hitBoxOffset,
       startDragging: (type, index) => {
         onStartDragging();
         onDropIndexChange(index);
@@ -95,6 +106,8 @@ export const DraggingContextProvider = ({
       dragType,
       dropIndex,
       dropLineIndex,
+      hitBoxOffset,
+      hitBoxWidth,
       isDragging,
       onDrop,
       onDropIndexChange,
@@ -122,17 +135,33 @@ export const DraggingContextProvider = ({
   // Handle quality-of-life stuff while dragging
   useEffect(() => {
     const preventDefault = (e: Event) => isDragging && e.preventDefault();
-    window.document.body.style.cursor =
+    document.body.style.cursor =
       isDragging && dragType === 'pointer' ? 'grabbing' : 'auto';
     // Prevent mobile browsers allowing pull-to-refresh etc. while dragging
-    window.document.body.addEventListener('touchmove', preventDefault, {
+    document.body.addEventListener('touchmove', preventDefault, {
       passive: false,
     });
     return () => {
-      window.document.body.style.cursor = 'auto';
-      window.document.body.removeEventListener('touchmove', preventDefault);
+      document.body.style.cursor = 'auto';
+      document.body.removeEventListener('touchmove', preventDefault);
     };
   }, [dragType, isDragging]);
+
+  // Handle dynamic hit-box width and offset
+  useEffect(() => {
+    const root = document.getElementById('root');
+    if (!root) return;
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      const parent = hitBoxParentRef.current;
+      if (entry?.target !== root || !parent) return;
+      setHitBoxWidth(root.clientWidth);
+      setHitBoxOffset(-parent.getBoundingClientRect().x);
+    });
+
+    resizeObserver.observe(root);
+    return () => resizeObserver.disconnect();
+  }, [isDragging, hitBoxParentRef]);
 
   return (
     <DraggingContext.Provider value={value}>

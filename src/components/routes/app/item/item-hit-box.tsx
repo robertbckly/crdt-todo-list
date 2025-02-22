@@ -1,25 +1,22 @@
-import { useEffect, useRef } from 'react';
+import { useContext } from 'react';
+import { DraggingContext } from '../../../../context/dragging-context';
+import { classnames } from '../../../../utils/classnames';
 
 /**
  * Invisible hit box to extend item surface for pointer events;
  * enables out-of-bounds dragging to be maintained
  */
 export const ItemHitBox = () => {
-  const hitBoxRef = useRef<HTMLDivElement>(null);
+  const { hitBoxWidth, hitBoxOffset } = useContext(DraggingContext);
+  const debug = false;
 
-  // Dynamically update width and offset if window resized
-  useEffect(() => {
-    const updateOffset = () => {
-      const hitBox = hitBoxRef.current;
-      const parent = hitBox?.parentElement;
-      if (!hitBox || !parent) return;
-      hitBox.style.width = `${document.documentElement.clientWidth}px`;
-      hitBox.style.left = `-${parent.getBoundingClientRect().x || 0}px`;
-    };
-    updateOffset();
-    window.addEventListener('resize', updateOffset);
-    return () => window.addEventListener('resize', updateOffset);
-  }, []);
-
-  return <div ref={hitBoxRef} className="absolute z-[1] h-full" />;
+  return (
+    <div
+      style={{ width: `${hitBoxWidth}px`, left: `${hitBoxOffset}px` }}
+      className={classnames(
+        'absolute z-[1] h-full',
+        debug && 'bg-red-500 opacity-10',
+      )}
+    />
+  );
 };

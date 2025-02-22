@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, type RefObject } from 'react';
 import { Button } from '../../../lib/button';
 import { ItemInput } from './item-input';
 import { ItemText } from './item-text';
@@ -14,6 +14,7 @@ type ListItemAttributes = React.HTMLAttributes<HTMLLIElement>;
 type Props = {
   index: number;
   data: TItem;
+  ref?: RefObject<HTMLLIElement | null>;
   disabled?: boolean;
   isLastInList?: boolean;
   onUpdate: (newData: TItem) => void;
@@ -23,6 +24,7 @@ type Props = {
 export const Item = ({
   index,
   data,
+  ref,
   disabled = false,
   isLastInList = false,
   onUpdate,
@@ -69,6 +71,7 @@ export const Item = ({
 
   return (
     <li
+      ref={ref}
       onPointerMove={handleListItemPointerMove}
       className={classnames(
         'relative flex items-center gap-2 border-y-2 border-transparent py-2',
