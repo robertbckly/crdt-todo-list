@@ -74,7 +74,7 @@ export const Item = ({
       ref={ref}
       onPointerMove={handleListItemPointerMove}
       className={classnames(
-        'relative flex items-center gap-2 border-y-2 border-transparent py-2',
+        'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
         !isLastInList && 'border-b border-b-black pb-2',
       )}
     >
