@@ -7,6 +7,7 @@ import {
   type PropsWithChildren,
   type RefObject,
 } from 'react';
+import { startAutoScroll, stopAutoScroll } from '../utils/auto-scroll';
 
 type DragType = 'pointer' | 'keyboard';
 
@@ -168,6 +169,31 @@ export const DraggingContextProvider = ({
     resizeObserver.observe(root);
     return () => resizeObserver.disconnect();
   }, [isDragging, hitBoxParentRef]);
+
+  // Handle drag auto-scroll
+  useEffect(() => {
+    const viewportHeight = document.documentElement.clientHeight;
+    const hasOverflow = document.documentElement.scrollHeight > viewportHeight;
+
+    const doSomething = (e: PointerEvent) => {
+      if (!isDragging || !hasOverflow) return;
+
+      const proportion = 0.1; // of viewport to hit for up/down scrolling
+      const pointerY = e.clientY;
+      const goAbove = pointerY < viewportHeight * proportion;
+      const goBelow = pointerY > viewportHeight * (1 - proportion);
+
+      if (goAbove) return startAutoScroll('up');
+      if (goBelow) return startAutoScroll('down');
+      stopAutoScroll();
+    };
+
+    document.addEventListener('pointermove', doSomething);
+    return () => {
+      stopAutoScroll();
+      document.removeEventListener('pointermove', doSomething);
+    };
+  }, [isDragging]);
 
   return (
     <DraggingContext.Provider value={value}>

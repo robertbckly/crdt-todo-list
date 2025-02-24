@@ -6,6 +6,9 @@
 - ~~add bounds to keyboard reordering~~
 - ~~delay before drag start via touch~~
 - auto-scroll on drag
+  - prevent cancellation outside of viewport... it's annoying!
+  - fix drop line not updating when auto scrolling while cursor is still
+  - make auto-scroll use a time-based increment for consistency
 - review lack of use of HTML drag-and-drop API; impact on a11y, etc.
 - truncation via dialog: "item view"
 - multiline support

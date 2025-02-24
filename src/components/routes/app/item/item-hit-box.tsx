@@ -7,8 +7,10 @@ import { classnames } from '../../../../utils/classnames';
  * enables out-of-bounds dragging to be maintained
  */
 export const ItemHitBox = () => {
-  const { hitBoxWidth, hitBoxOffset } = useContext(DraggingContext);
+  const { isDragging, hitBoxWidth, hitBoxOffset } = useContext(DraggingContext);
   const debug = false;
+
+  if (!isDragging) return null;
 
   return (
     <div

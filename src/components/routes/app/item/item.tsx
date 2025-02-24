@@ -78,7 +78,7 @@ export const Item = ({
         !isLastInList && 'border-b border-b-black pb-2',
       )}
     >
-      {isDragging && <ItemHitBox />}
+      <ItemHitBox />
 
       {isEditing && (
         <ItemInput
@@ -90,6 +90,7 @@ export const Item = ({
           onBlur={endEdit}
         />
       )}
+
       {!isEditing && (
         <>
           <ItemDragHandle index={index} />
