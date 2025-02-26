@@ -5,6 +5,8 @@ import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 // @ts-expect-error no types
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+// @ts-expect-error no types
+import reactCompiler from 'eslint-plugin-react-compiler';
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -12,6 +14,7 @@ export default tseslint.config(
   // @ts-expect-error lib type error?
   reactPlugin.configs.flat.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
+  reactCompiler.configs.recommended,
   {
     files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
     plugins: { 'react-hooks': reactHooksPlugin },
