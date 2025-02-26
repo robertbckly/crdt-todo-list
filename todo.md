@@ -6,6 +6,9 @@
 - ~~add bounds to keyboard reordering~~
 - ~~delay before drag start via touch~~
 - auto-scroll on drag
+  - \*\*\* review the mess of dragging-context props changing every render...
+    - either need to memoise ahead of passing, or extract the ref/memo solution
+  - dragging off viewport and entering again is unusable... can't get item 99 to 0
   - prevent cancellation outside of viewport... it's annoying!
   - fix drop line not updating when auto scrolling while cursor is still
   - make auto-scroll use a time-based increment for consistency
