@@ -1,27 +1,18 @@
-import { useContext, useRef } from 'react';
-import { DraggingContext } from '../../../../context/dragging-context';
-import { classnames } from '../../../../utils/classnames';
+import { useRef } from 'react';
+import { classnames } from '../../utils/classnames';
+import { useDrag, useDragDispatch } from './drag-context';
 
 type ButtonAttributes = React.ButtonHTMLAttributes<HTMLButtonElement>;
-
 type Props = {
   index: number;
 };
 
 const DRAG_START_DELAY = 250; // ms
 
-export const ItemDragHandle = ({ index }: Props) => {
+export const DragHandle = ({ index }: Props) => {
   const timeoutRef = useRef<number | null>(null);
-  const {
-    isDragging,
-    dragType,
-    dragIndex,
-    dropLineIndex,
-    startDragging,
-    stopDragging,
-    updateDropLineIndex,
-    drop,
-  } = useContext(DraggingContext);
+  const { isDragging, dragType, dragIndex, dropLineIndex } = useDrag();
+  const dispatch = useDragDispatch();
 
   const handlePointerDown: ButtonAttributes['onPointerDown'] = async (e) => {
     e.currentTarget.releasePointerCapture(e.pointerId);
@@ -31,7 +22,7 @@ export const ItemDragHandle = ({ index }: Props) => {
       });
       if (!timeoutRef.current) return;
     }
-    startDragging('pointer', index);
+    dispatch?.({ type: 'started', dragType: 'pointer', overIndex: index });
   };
 
   const handleCancelDuringDelay = () => {
@@ -44,33 +35,39 @@ export const ItemDragHandle = ({ index }: Props) => {
     switch (e.key) {
       case ' ':
       case 'Enter':
-        if (!isDragging) startDragging('keyboard', index);
-        if (isDragging) drop();
+        if (!isDragging) {
+          dispatch?.({
+            type: 'started',
+            dragType: 'keyboard',
+            overIndex: index,
+          });
+        }
+        // if (isDragging) drop();
         break;
       case 'Escape':
-        stopDragging();
+        dispatch?.({ type: 'stopped' });
         break;
       case 'ArrowUp':
         if (dragType !== 'keyboard') break;
-        updateDropLineIndex(dropLineIndex - 2);
+        dispatch?.({ type: 'dragged', overDropLineIndex: dropLineIndex - 2 });
         break;
       case 'ArrowDown':
         if (dragType !== 'keyboard') break;
-        updateDropLineIndex(dropLineIndex + 2);
+        dispatch?.({ type: 'dragged', overDropLineIndex: dropLineIndex + 2 });
         break;
     }
   };
 
   return (
     <button
-      className={classnames(
-        'h-8 w-8 shrink-0 cursor-pointer rounded bg-black active:cursor-grabbing',
-        isDragging && index === dragIndex ? 'opacity-100' : 'opacity-50',
-      )}
       onPointerDown={handlePointerDown}
       onPointerLeave={handleCancelDuringDelay}
       onPointerCancel={handleCancelDuringDelay}
       onKeyDown={handleKeyDown}
+      className={classnames(
+        'h-8 w-8 shrink-0 cursor-pointer rounded bg-black active:cursor-grabbing',
+        isDragging && index === dragIndex ? 'opacity-100' : 'opacity-50',
+      )}
     />
   );
 };

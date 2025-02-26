@@ -1,16 +1,18 @@
-import { useContext, useState, type RefObject } from 'react';
+import { useState, type RefObject } from 'react';
 import { Button } from '../../../lib/button';
 import { ItemInput } from './item-input';
 import { ItemText } from './item-text';
-import { type Item as TItem } from '../../../../types/item';
-import { ItemDragHandle } from './item-drag-handle';
-import { DraggingContext } from '../../../../context/dragging-context';
 import { classnames } from '../../../../utils/classnames';
-import { ItemHitBox } from './item-hit-box';
+import { DragHandle } from '../../../../libs/dragging/drag-handle';
+import { DragHitBox } from '../../../../libs/dragging/drag-hit-box';
+import {
+  useDrag,
+  useDragDispatch,
+} from '../../../../libs/dragging/drag-context';
+import { type Item as TItem } from '../../../../types/item';
 
+type LIAttributes = React.HTMLAttributes<HTMLLIElement>;
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
-type ListItemAttributes = React.HTMLAttributes<HTMLLIElement>;
-
 type Props = {
   index: number;
   data: TItem;
@@ -32,8 +34,8 @@ export const Item = ({
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
-  const { isDragging, dragType, updateDropLineIndex } =
-    useContext(DraggingContext);
+  const { isDragging, dragType } = useDrag();
+  const dispatch = useDragDispatch();
 
   const startEdit = () => setIsEditing(true);
 
@@ -55,9 +57,7 @@ export const Item = ({
     }
   };
 
-  const handleListItemPointerMove: ListItemAttributes['onPointerMove'] = (
-    e,
-  ) => {
+  const handlePointerMove: LIAttributes['onPointerMove'] = (e) => {
     if (!isDragging || dragType !== 'pointer') return;
     // Note: all positions are relative to viewport
     const { top, height } = e.currentTarget.getBoundingClientRect();
@@ -66,19 +66,22 @@ export const Item = ({
     // Each item gets index & index + 1 without overlap between items,
     // representing above and below the item
     const topBottomOffset = mouseY <= itemMidpoint ? 0 : 1;
-    updateDropLineIndex(index * 2 + topBottomOffset);
+    dispatch?.({
+      type: 'dragged',
+      overDropLineIndex: index * 2 + topBottomOffset,
+    });
   };
 
   return (
     <li
       ref={ref}
-      onPointerMove={handleListItemPointerMove}
+      onPointerMove={handlePointerMove}
       className={classnames(
         'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
         !isLastInList && 'border-b border-b-black pb-2',
       )}
     >
-      <ItemHitBox />
+      <DragHitBox />
 
       {isEditing && (
         <ItemInput
@@ -93,7 +96,7 @@ export const Item = ({
 
       {!isEditing && (
         <>
-          <ItemDragHandle index={index} />
+          <DragHandle index={index} />
 
           <input
             type="checkbox"
