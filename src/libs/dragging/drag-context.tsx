@@ -5,12 +5,13 @@ import {
   type ActionDispatch,
   type PropsWithChildren,
 } from 'react';
-import { usePointerDrop } from './hooks/use-pointer-drop';
-import { useDraggingHelpers } from './hooks/use-dragging-helpers';
 import { useAutoScroll } from './hooks/use-auto-scroll';
+import { useDraggingHelpers } from './hooks/use-dragging-helpers';
+import { usePointerDrop } from './hooks/use-pointer-drop';
+import { useHitBoxResize } from './hooks/use-hit-box-resize';
 
-type DragType = 'pointer' | 'keyboard';
-type DragContextValue = {
+export type DragType = 'pointer' | 'keyboard';
+export type DragContextValue = {
   isDragging: boolean;
   dragType: DragType | null;
   dragIndex: number;
@@ -19,12 +20,13 @@ type DragContextValue = {
   hitBoxWidth: number;
   hitBoxOffset: number;
 };
-type Action =
+export type DragAction =
   | { type: 'started'; dragType: DragType; overIndex: number }
   | { type: 'stopped' }
   | { type: 'dragged'; overDropLineIndex: number }
-  | { type: 'dropped'; fromIndex: number; toIndex: number };
-type Dispatch = ActionDispatch<[action: Action]>;
+  | { type: 'dropped'; fromIndex: number; toIndex: number }
+  | { type: 'updated_hit_box'; width: number; offset: number };
+export type DragDispatch = ActionDispatch<[action: DragAction]>;
 
 const INIT_STATE = {
   isDragging: false,
@@ -35,13 +37,12 @@ const INIT_STATE = {
   hitBoxWidth: 0,
   hitBoxOffset: 0,
 } as const;
-
 const DragContext = createContext<DragContextValue>(INIT_STATE);
-const DragDispatchContext = createContext<Dispatch | null>(null);
+const DragDispatchContext = createContext<DragDispatch | null>(null);
 
 const dragReducer = (
   state: DragContextValue,
-  action: Action,
+  action: DragAction,
 ): DragContextValue => {
   switch (action.type) {
     case 'started':
@@ -69,6 +70,12 @@ const dragReducer = (
         dropIndex: -1,
         dropLineIndex: -1,
       };
+    case 'updated_hit_box':
+      return {
+        ...state,
+        hitBoxWidth: action.width,
+        hitBoxOffset: action.offset,
+      };
     default:
       return state;
   }
@@ -77,17 +84,22 @@ const dragReducer = (
 export const useDrag = () => useContext(DragContext);
 export const useDragDispatch = () => useContext(DragDispatchContext);
 
-export const DragProvider = ({ children }: PropsWithChildren) => {
+type Props = PropsWithChildren<{
+  firstItemRef: React.RefObject<HTMLElement | null>;
+}>;
+
+export const DragProvider = ({ children, firstItemRef }: Props) => {
   const [dragState, dispatch] = useReducer(dragReducer, INIT_STATE);
 
-  usePointerDrop();
-  useDraggingHelpers();
-  useAutoScroll();
-  // useHitBoxResize({
-  //   parentRef: hitBoxParentRef,
-  //   onWidthChange: setHitBoxWidth,
-  //   onOffsetChange: setHitBoxOffset,
-  // });
+  useDraggingHelpers(dragState, dispatch);
+  usePointerDrop(dragState, dispatch);
+  useAutoScroll(dragState);
+  useHitBoxResize({
+    parentRef: firstItemRef,
+    onChange: ({ width, offset }) => {
+      dispatch({ type: 'updated_hit_box', width, offset });
+    },
+  });
 
   return (
     <DragContext.Provider value={dragState}>

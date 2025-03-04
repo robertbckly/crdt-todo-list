@@ -2,15 +2,10 @@ import { useEffect, type RefObject } from 'react';
 
 type Params = {
   parentRef: RefObject<HTMLElement | null>;
-  onWidthChange: (width: number) => void;
-  onOffsetChange: (offset: number) => void;
+  onChange: (params: Record<'width' | 'offset', number>) => void;
 };
 
-export const useHitBoxResize = ({
-  parentRef,
-  onWidthChange,
-  onOffsetChange,
-}: Params) => {
+export const useHitBoxResize = ({ parentRef, onChange }: Params) => {
   useEffect(() => {
     const root = document.getElementById('root');
     if (!root) return;
@@ -18,11 +13,13 @@ export const useHitBoxResize = ({
     const resizeObserver = new ResizeObserver(([entry]) => {
       const parent = parentRef.current;
       if (entry?.target !== root || !parent) return;
-      onWidthChange(root.clientWidth);
-      onOffsetChange(-parent.getBoundingClientRect().x);
+      onChange({
+        width: root.clientWidth,
+        offset: -parent.getBoundingClientRect().x,
+      });
     });
 
     resizeObserver.observe(root);
     return () => resizeObserver.disconnect();
-  }, [parentRef, onOffsetChange, onWidthChange]);
+  }, [onChange, parentRef]);
 };

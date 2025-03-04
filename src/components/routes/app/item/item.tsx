@@ -34,7 +34,7 @@ export const Item = ({
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
-  const { isDragging, dragType } = useDrag();
+  const { isDragging, dragType, dropLineIndex } = useDrag();
   const dispatch = useDragDispatch();
 
   const startEdit = () => setIsEditing(true);
@@ -66,9 +66,12 @@ export const Item = ({
     // Each item gets index & index + 1 without overlap between items,
     // representing above and below the item
     const topBottomOffset = mouseY <= itemMidpoint ? 0 : 1;
+
+    const newDropLineIndex = index * 2 + topBottomOffset;
+    if (newDropLineIndex === dropLineIndex) return;
     dispatch?.({
       type: 'dragged',
-      overDropLineIndex: index * 2 + topBottomOffset,
+      overDropLineIndex: newDropLineIndex,
     });
   };
 
