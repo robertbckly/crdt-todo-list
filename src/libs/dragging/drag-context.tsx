@@ -86,19 +86,18 @@ export const useDragDispatch = () => useContext(DragDispatchContext);
 
 type Props = PropsWithChildren<{
   firstItemRef: React.RefObject<HTMLElement | null>;
+  onDrop: (from: number, to: number) => void;
 }>;
 
-export const DragProvider = ({ children, firstItemRef }: Props) => {
+export const DragProvider = ({ children, firstItemRef, onDrop }: Props) => {
   const [dragState, dispatch] = useReducer(dragReducer, INIT_STATE);
 
   useDraggingHelpers(dragState, dispatch);
-  usePointerDrop(dragState, dispatch);
+  usePointerDrop(dragState, dispatch, onDrop);
   useAutoScroll(dragState);
   useHitBoxResize({
     parentRef: firstItemRef,
-    onChange: ({ width, offset }) => {
-      dispatch({ type: 'updated_hit_box', width, offset });
-    },
+    dispatch,
   });
 
   return (

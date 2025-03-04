@@ -1,11 +1,12 @@
 import { useEffect, type RefObject } from 'react';
+import type { DragDispatch } from '../drag-context';
 
 type Params = {
   parentRef: RefObject<HTMLElement | null>;
-  onChange: (params: Record<'width' | 'offset', number>) => void;
+  dispatch: DragDispatch;
 };
 
-export const useHitBoxResize = ({ parentRef, onChange }: Params) => {
+export const useHitBoxResize = ({ parentRef, dispatch }: Params) => {
   useEffect(() => {
     const root = document.getElementById('root');
     if (!root) return;
@@ -13,7 +14,8 @@ export const useHitBoxResize = ({ parentRef, onChange }: Params) => {
     const resizeObserver = new ResizeObserver(([entry]) => {
       const parent = parentRef.current;
       if (entry?.target !== root || !parent) return;
-      onChange({
+      dispatch({
+        type: 'updated_hit_box',
         width: root.clientWidth,
         offset: -parent.getBoundingClientRect().x,
       });
@@ -21,5 +23,5 @@ export const useHitBoxResize = ({ parentRef, onChange }: Params) => {
 
     resizeObserver.observe(root);
     return () => resizeObserver.disconnect();
-  }, [onChange, parentRef]);
+  }, [dispatch, parentRef]);
 };

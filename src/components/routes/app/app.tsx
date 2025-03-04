@@ -17,7 +17,7 @@ export const App = () => {
     createItem,
     // updateItem,
     // deleteItem,
-    // moveItem,
+    moveItem,
     sync,
   } = useData();
 
@@ -58,7 +58,7 @@ export const App = () => {
 
       <div className="my-2 flex flex-col gap-2">
         <ItemForm disabled={!isReady} onCreate={handleCreate} />
-        <DragProvider firstItemRef={firstItemRef}>
+        <DragProvider firstItemRef={firstItemRef} onDrop={moveItem}>
           <ItemList
             items={items}
             disabled={!isReady}

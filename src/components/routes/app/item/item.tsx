@@ -5,13 +5,8 @@ import { ItemText } from './item-text';
 import { classnames } from '../../../../utils/classnames';
 import { DragHandle } from '../../../../libs/dragging/drag-handle';
 import { DragHitBox } from '../../../../libs/dragging/drag-hit-box';
-import {
-  useDrag,
-  useDragDispatch,
-} from '../../../../libs/dragging/drag-context';
 import { type Item as TItem } from '../../../../types/item';
 
-type LIAttributes = React.HTMLAttributes<HTMLLIElement>;
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 type Props = {
   index: number;
@@ -34,8 +29,6 @@ export const Item = ({
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
-  const { isDragging, dragType, dropLineIndex } = useDrag();
-  const dispatch = useDragDispatch();
 
   const startEdit = () => setIsEditing(true);
 
@@ -57,34 +50,15 @@ export const Item = ({
     }
   };
 
-  const handlePointerMove: LIAttributes['onPointerMove'] = (e) => {
-    if (!isDragging || dragType !== 'pointer') return;
-    // Note: all positions are relative to viewport
-    const { top, height } = e.currentTarget.getBoundingClientRect();
-    const itemMidpoint = top + height / 2;
-    const mouseY = e.clientY;
-    // Each item gets index & index + 1 without overlap between items,
-    // representing above and below the item
-    const topBottomOffset = mouseY <= itemMidpoint ? 0 : 1;
-
-    const newDropLineIndex = index * 2 + topBottomOffset;
-    if (newDropLineIndex === dropLineIndex) return;
-    dispatch?.({
-      type: 'dragged',
-      overDropLineIndex: newDropLineIndex,
-    });
-  };
-
   return (
     <li
       ref={ref}
-      onPointerMove={handlePointerMove}
       className={classnames(
         'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
         !isLastInList && 'border-b border-b-black pb-2',
       )}
     >
-      <DragHitBox />
+      <DragHitBox index={index} />
 
       {isEditing && (
         <ItemInput
