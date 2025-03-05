@@ -7,6 +7,7 @@
 - ~~delay before drag start via touch~~
 - refactor data layer to use reducer + context pattern, like drag lib
 - dnd
+  - ignore non-primary pointers when dragging (to allow simultaneous manual scroll on mobile)
   - improve auto-scroll (ux; keyboard scroll; use a time-based loop)
   - dragging off viewport and entering again is unusable... can't get item 99 to 0
   - fix drop line not updating when auto scrolling while cursor is still
