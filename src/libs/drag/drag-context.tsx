@@ -24,7 +24,6 @@ const dragReducer = (
   state: DragContextValue,
   action: DragAction,
 ): DragContextValue => {
-  console.log(action);
   switch (action.type) {
     case 'started':
       return {
