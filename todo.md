@@ -5,6 +5,7 @@
 - ~~continue drag updates out of list's bounds~~
 - ~~add bounds to keyboard reordering~~
 - ~~delay before drag start via touch~~
+- refactor data layer to use reducer + context pattern, like drag lib
 - dnd
   - improve auto-scroll (ux; keyboard scroll; use a time-based loop)
   - dragging off viewport and entering again is unusable... can't get item 99 to 0
