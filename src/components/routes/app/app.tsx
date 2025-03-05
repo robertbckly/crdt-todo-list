@@ -4,8 +4,8 @@ import { Button } from '../../lib/button';
 import { useData } from '../../../hooks/use-data';
 import { Link } from '../../lib/link';
 import { ROUTES } from '../../../constants/routes';
-import { useEffect, useRef, useState } from 'react';
-import { DragProvider } from '../../../libs/dragging/drag-context';
+import { useEffect, useState } from 'react';
+import { DragProvider } from '../../../libs/drag/drag-context';
 import type { Item as TItem } from '../../../types/item';
 
 export const App = () => {
@@ -20,9 +20,6 @@ export const App = () => {
     moveItem,
     sync,
   } = useData();
-
-  // First item is measured to determine hit-box width and offset
-  const firstItemRef = useRef<HTMLLIElement>(null);
 
   // Init: run sync when ready
   useEffect(() => {
@@ -58,12 +55,8 @@ export const App = () => {
 
       <div className="my-2 flex flex-col gap-2">
         <ItemForm disabled={!isReady} onCreate={handleCreate} />
-        <DragProvider firstItemRef={firstItemRef} onDrop={moveItem}>
-          <ItemList
-            items={items}
-            disabled={!isReady}
-            firstItemRef={firstItemRef}
-          />
+        <DragProvider onDrop={moveItem}>
+          <ItemList items={items} disabled={!isReady} />
         </DragProvider>
       </div>
     </main>

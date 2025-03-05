@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
-import { type DragContextValue, type DragDispatch } from '../drag-context';
+import type { DragContextValue, DragDispatch } from '../types';
 
-export const useDraggingHelpers = (
-  context: DragContextValue,
-  dispatch: DragDispatch,
-) => {
-  const { isDragging, dragType } = context;
+type Params = {
+  dragState: DragContextValue;
+  dispatch: DragDispatch;
+};
+
+export const useDragHelpers = ({ dragState, dispatch }: Params) => {
+  const { isDragging, dragType } = dragState;
 
   useEffect(() => {
     const preventDefault = (e: Event) => isDragging && e.preventDefault();

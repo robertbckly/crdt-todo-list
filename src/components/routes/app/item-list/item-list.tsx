@@ -1,16 +1,15 @@
 import { Fragment } from 'react';
 import { Item } from '../item/item';
 import { ItemDropLine } from '../item/item-drop-line';
-import { useDrag } from '../../../../libs/dragging/drag-context';
+import { useDrag } from '../../../../libs/drag/drag-context';
 import type { Item as TItem } from '../../../../types/item';
 
 type Props = {
   items: TItem[];
   disabled: boolean;
-  firstItemRef: React.RefObject<HTMLLIElement | null>;
 };
 
-export const ItemList = ({ items, disabled, firstItemRef }: Props) => {
+export const ItemList = ({ items, disabled }: Props) => {
   const { isDragging, dropIndex } = useDrag();
 
   return (
@@ -21,7 +20,6 @@ export const ItemList = ({ items, disabled, firstItemRef }: Props) => {
         .map((item, index) => (
           <Fragment key={item.id}>
             <Item
-              ref={index === 0 ? firstItemRef : undefined}
               index={index}
               data={item}
               disabled={disabled || isDragging}

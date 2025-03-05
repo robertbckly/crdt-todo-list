@@ -11,7 +11,14 @@ const DRAG_START_DELAY = 250; // ms
 
 export const DragHandle = ({ index }: Props) => {
   const timeoutRef = useRef<number | null>(null);
-  const { isDragging, dragType, dragIndex, dropLineIndex } = useDrag();
+  const {
+    isDragging,
+    dragType,
+    dragIndex,
+    dropIndex,
+    dropLineIndex,
+    dropCallback,
+  } = useDrag();
   const dispatch = useDragDispatch();
 
   const handlePointerDown: ButtonAttributes['onPointerDown'] = async (e) => {
@@ -32,6 +39,7 @@ export const DragHandle = ({ index }: Props) => {
   };
 
   const handleKeyDown: ButtonAttributes['onKeyDown'] = (e) => {
+    e.preventDefault();
     switch (e.key) {
       case ' ':
       case 'Enter':
@@ -42,7 +50,10 @@ export const DragHandle = ({ index }: Props) => {
             overIndex: index,
           });
         }
-        // if (isDragging) drop();
+        if (isDragging) {
+          dropCallback?.(dragIndex, dropIndex);
+          dispatch?.({ type: 'stopped' });
+        }
         break;
       case 'Escape':
         dispatch?.({ type: 'stopped' });

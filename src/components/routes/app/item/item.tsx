@@ -1,17 +1,16 @@
-import { useState, type RefObject } from 'react';
+import { useState } from 'react';
 import { Button } from '../../../lib/button';
 import { ItemInput } from './item-input';
 import { ItemText } from './item-text';
 import { classnames } from '../../../../utils/classnames';
-import { DragHandle } from '../../../../libs/dragging/drag-handle';
-import { DragHitBox } from '../../../../libs/dragging/drag-hit-box';
+import { DragHandle } from '../../../../libs/drag/drag-handle';
+import { DragHitBox } from '../../../../libs/drag/drag-hit-box';
 import { type Item as TItem } from '../../../../types/item';
 
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 type Props = {
   index: number;
   data: TItem;
-  ref?: RefObject<HTMLLIElement | null>;
   disabled?: boolean;
   isLastInList?: boolean;
   onUpdate: (newData: TItem) => void;
@@ -21,7 +20,6 @@ type Props = {
 export const Item = ({
   index,
   data,
-  ref,
   disabled = false,
   isLastInList = false,
   onUpdate,
@@ -52,7 +50,6 @@ export const Item = ({
 
   return (
     <li
-      ref={ref}
       className={classnames(
         'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
         !isLastInList && 'border-b border-b-black pb-2',

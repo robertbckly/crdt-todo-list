@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { classnames } from '../../utils/classnames';
 import { useDrag, useDragDispatch } from './drag-context';
 
@@ -12,9 +13,30 @@ type Props = {
  */
 export const DragHitBox = ({ index }: Props) => {
   const debug = false;
+  const hitBoxRef = useRef<HTMLDivElement>(null);
   const { isDragging, dragType, dropLineIndex, hitBoxWidth, hitBoxOffset } =
     useDrag();
   const dispatch = useDragDispatch();
+
+  useEffect(() => {
+    if (index !== 0 || !isDragging) return;
+
+    const root = document.getElementById('root');
+    if (!root) return;
+
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      const parent = hitBoxRef.current?.parentElement;
+      if (entry?.target !== root || !parent) return;
+      dispatch?.({
+        type: 'updated_hit_box',
+        width: root.clientWidth,
+        offset: -parent.getBoundingClientRect().x,
+      });
+    });
+
+    resizeObserver.observe(root);
+    return () => resizeObserver.disconnect();
+  }, [dispatch, index, isDragging]);
 
   const handlePointerMove: DivAttributes['onPointerMove'] = (e) => {
     if (!isDragging || dragType !== 'pointer') return;
@@ -42,6 +64,7 @@ export const DragHitBox = ({ index }: Props) => {
 
   return (
     <div
+      ref={hitBoxRef}
       onPointerMove={handlePointerMove}
       style={{ width: `${hitBoxWidth}px`, left: `${hitBoxOffset}px` }}
       className={classnames(

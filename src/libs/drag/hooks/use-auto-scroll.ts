@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { type DragContextValue } from '../drag-context';
+import type { DragContextValue } from '../types';
 
 const RATE = 4;
 
@@ -22,8 +22,12 @@ const stopAutoScroll = () => {
   currentScroll = null;
 };
 
-export const useAutoScroll = (context: DragContextValue) => {
-  const { isDragging } = context;
+type Params = {
+  dragState: DragContextValue;
+};
+
+export const useAutoScroll = ({ dragState }: Params) => {
+  const { isDragging } = dragState;
 
   useEffect(() => {
     const viewportHeight = document.documentElement.clientHeight;
