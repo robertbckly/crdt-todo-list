@@ -72,7 +72,7 @@ export const useDrag = () => useContext(DragContext);
 export const useDragDispatch = () => useContext(DragDispatchContext);
 
 type Props = PropsWithChildren<{
-  onDrop: (fromIndex: number, toIndex: number) => void;
+  onDrop: DragContextValue['dropCallback'];
 }>;
 
 export const DragProvider = ({ children, onDrop }: Props) => {

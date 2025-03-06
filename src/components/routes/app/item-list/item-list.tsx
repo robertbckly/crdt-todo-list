@@ -1,15 +1,37 @@
 import { Fragment } from 'react';
 import { Item } from '../item/item';
 import { ItemDropLine } from '../item/item-drop-line';
-import { useDrag } from '../../../../libs/drag/drag-context';
-import type { Item as TItem } from '../../../../types/item';
+import { useData, useDataDispatch } from '../../../../libs/data/data-context';
+import { DragProvider, useDrag } from '../../../../libs/drag/drag-context';
+import { useClientId } from '../../../../hooks/use-client-id';
 
 type Props = {
-  items: TItem[];
   disabled: boolean;
 };
 
-export const ItemList = ({ items, disabled }: Props) => {
+export const ItemList = (props: Props) => {
+  const { clientId } = useClientId();
+  const dataDispatch = useDataDispatch();
+
+  const moveItem = (fromIndex: number, toIndex: number) => {
+    if (!clientId) return;
+    dataDispatch?.({
+      type: 'ordered',
+      clientId,
+      fromIndex,
+      toIndex,
+    });
+  };
+
+  return (
+    <DragProvider onDrop={moveItem}>
+      <BaseItemList {...props} />
+    </DragProvider>
+  );
+};
+
+const BaseItemList = ({ disabled }: Props) => {
+  const { items } = useData();
   const { isDragging, dropIndex } = useDrag();
 
   return (
@@ -24,10 +46,6 @@ export const ItemList = ({ items, disabled }: Props) => {
               data={item}
               disabled={disabled || isDragging}
               isLastInList={index === items.length - 1}
-              // onUpdate={handleUpdate}
-              // onDelete={() => handleDelete(item.id)}
-              onUpdate={() => {}}
-              onDelete={() => {}}
             />
             <ItemDropLine
               // Display beneath item before `dropIndex`

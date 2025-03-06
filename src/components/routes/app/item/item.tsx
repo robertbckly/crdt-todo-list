@@ -6,6 +6,8 @@ import { classnames } from '../../../../utils/classnames';
 import { DragHandle } from '../../../../libs/drag/drag-handle';
 import { DragHitBox } from '../../../../libs/drag/drag-hit-box';
 import { type Item as TItem } from '../../../../types/item';
+import { useDataDispatch } from '../../../../libs/data/data-context';
+import { useClientId } from '../../../../hooks/use-client-id';
 
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 type Props = {
@@ -13,8 +15,6 @@ type Props = {
   data: TItem;
   disabled?: boolean;
   isLastInList?: boolean;
-  onUpdate: (newData: TItem) => void;
-  onDelete: () => void;
 };
 
 export const Item = ({
@@ -22,23 +22,47 @@ export const Item = ({
   data,
   disabled = false,
   isLastInList = false,
-  onUpdate,
-  onDelete,
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
+  const { clientId } = useClientId();
+  const dispatch = useDataDispatch();
 
   const startEdit = () => setIsEditing(true);
 
   const endEdit = () => {
-    onUpdate({ ...data, text: inputText });
+    if (!clientId) return;
+    dispatch?.({
+      type: 'updated',
+      clientId,
+      itemId: data.id,
+      updates: {
+        ...data,
+        text: inputText,
+      },
+    });
     setIsEditing(false);
   };
 
+  const deleteItem = () => {
+    if (!clientId) return;
+    dispatch?.({
+      type: 'deleted',
+      clientId,
+      itemId: data.id,
+    });
+  };
+
   const toggleStatus = () => {
-    onUpdate({
-      ...data,
-      status: data.status === 'open' ? 'closed' : 'open',
+    if (!clientId) return;
+    dispatch?.({
+      type: 'updated',
+      clientId,
+      itemId: data.id,
+      updates: {
+        ...data,
+        status: data.status === 'open' ? 'closed' : 'open',
+      },
     });
   };
 
@@ -92,7 +116,7 @@ export const Item = ({
             Edit
           </Button>
 
-          <Button onClick={onDelete} disabled={disabled}>
+          <Button onClick={deleteItem} disabled={disabled}>
             Delete
           </Button>
         </>
