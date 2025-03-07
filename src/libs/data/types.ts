@@ -6,29 +6,24 @@ export type DataContextValue = CRDT;
 
 export type DataAction =
   | {
-      type: 'restored';
-      clientId: string;
+      type: 'restored_data';
       data: DataContextValue;
     }
   | {
-      type: 'created';
-      clientId: string;
+      type: 'created_item';
       text: Item['text'];
     }
   | {
-      type: 'updated';
-      clientId: string;
+      type: 'updated_item';
       itemId: string;
       updates: Omit<Item, 'id' | 'clientId' | 'counter' | 'order'>;
     }
   | {
-      type: 'deleted';
-      clientId: string;
+      type: 'deleted_item';
       itemId: string;
     }
   | {
-      type: 'ordered';
-      clientId: string;
+      type: 'ordered_item';
       fromIndex: number;
       toIndex: number;
     };

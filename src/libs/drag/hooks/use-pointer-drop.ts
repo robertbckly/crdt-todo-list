@@ -7,18 +7,17 @@ type Params = {
 };
 
 export const usePointerDrop = ({ dragState, dispatch }: Params) => {
-  const { isDragging, dragType, dragIndex, dropIndex, dropCallback } =
-    dragState;
+  const { isDragging, dragType, dragIndex, dropIndex, drop } = dragState;
 
   useEffect(() => {
     if (!isDragging || dragType !== 'pointer') return;
 
-    const drop = () => {
-      dropCallback?.(dragIndex, dropIndex);
+    const doDrop = () => {
+      drop?.(dragIndex, dropIndex);
       dispatch({ type: 'stopped' });
     };
 
-    document.body.addEventListener('pointerup', drop);
-    return () => document.body.removeEventListener('pointerup', drop);
-  }, [dispatch, dragIndex, dragType, dropCallback, dropIndex, isDragging]);
+    document.body.addEventListener('pointerup', doDrop);
+    return () => document.body.removeEventListener('pointerup', doDrop);
+  }, [dispatch, dragIndex, dragType, drop, dropIndex, isDragging]);
 };

@@ -17,7 +17,7 @@ const INIT_STATE = {
   dropLineIndex: -1,
   hitBoxWidth: 0,
   hitBoxOffset: 0,
-  dropCallback: null,
+  drop: null,
 } as const satisfies DragContextValue;
 
 const dragReducer = (
@@ -58,7 +58,7 @@ const dragReducer = (
     case 'updated_drop_callback':
       return {
         ...state,
-        dropCallback: action.callback,
+        drop: action.callback,
       };
     default:
       return state;
@@ -72,22 +72,22 @@ export const useDrag = () => useContext(DragContext);
 export const useDragDispatch = () => useContext(DragDispatchContext);
 
 type Props = PropsWithChildren<{
-  onDrop: DragContextValue['dropCallback'];
+  onDrop: DragContextValue['drop'];
 }>;
 
 export const DragProvider = ({ children, onDrop }: Props) => {
   const [dragState, dispatch] = useReducer(dragReducer, INIT_STATE);
 
-  if (onDrop !== dragState.dropCallback) {
+  useDragHelpers({ dragState, dispatch });
+  usePointerDrop({ dragState, dispatch });
+  useAutoScroll({ dragState });
+
+  if (onDrop !== dragState.drop) {
     dispatch({
       type: 'updated_drop_callback',
       callback: onDrop,
     });
   }
-
-  useDragHelpers({ dragState, dispatch });
-  usePointerDrop({ dragState, dispatch });
-  useAutoScroll({ dragState });
 
   return (
     <DragContext.Provider value={dragState}>

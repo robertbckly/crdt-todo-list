@@ -3,21 +3,17 @@ import { Item } from '../item/item';
 import { ItemDropLine } from '../item/item-drop-line';
 import { useData, useDataDispatch } from '../../../../libs/data/data-context';
 import { DragProvider, useDrag } from '../../../../libs/drag/drag-context';
-import { useClientId } from '../../../../hooks/use-client-id';
 
 type Props = {
   disabled: boolean;
 };
 
 export const ItemList = (props: Props) => {
-  const { clientId } = useClientId();
   const dataDispatch = useDataDispatch();
 
   const moveItem = (fromIndex: number, toIndex: number) => {
-    if (!clientId) return;
     dataDispatch?.({
-      type: 'ordered',
-      clientId,
+      type: 'ordered_item',
       fromIndex,
       toIndex,
     });

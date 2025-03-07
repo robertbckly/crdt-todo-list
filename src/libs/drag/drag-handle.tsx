@@ -11,14 +11,8 @@ const DRAG_START_DELAY = 250; // ms
 
 export const DragHandle = ({ index }: Props) => {
   const timeoutRef = useRef<number | null>(null);
-  const {
-    isDragging,
-    dragType,
-    dragIndex,
-    dropIndex,
-    dropLineIndex,
-    dropCallback,
-  } = useDrag();
+  const { isDragging, dragType, dragIndex, dropIndex, dropLineIndex, drop } =
+    useDrag();
   const dispatch = useDragDispatch();
 
   const handlePointerDown: ButtonAttributes['onPointerDown'] = async (e) => {
@@ -51,7 +45,7 @@ export const DragHandle = ({ index }: Props) => {
           });
         }
         if (isDragging) {
-          dropCallback?.(dragIndex, dropIndex);
+          drop?.(dragIndex, dropIndex);
           dispatch?.({ type: 'stopped' });
         }
         break;

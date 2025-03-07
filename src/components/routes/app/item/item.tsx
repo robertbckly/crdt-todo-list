@@ -7,7 +7,6 @@ import { DragHandle } from '../../../../libs/drag/drag-handle';
 import { DragHitBox } from '../../../../libs/drag/drag-hit-box';
 import { type Item as TItem } from '../../../../types/item';
 import { useDataDispatch } from '../../../../libs/data/data-context';
-import { useClientId } from '../../../../hooks/use-client-id';
 
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 type Props = {
@@ -25,16 +24,13 @@ export const Item = ({
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
-  const { clientId } = useClientId();
   const dispatch = useDataDispatch();
 
   const startEdit = () => setIsEditing(true);
 
   const endEdit = () => {
-    if (!clientId) return;
     dispatch?.({
-      type: 'updated',
-      clientId,
+      type: 'updated_item',
       itemId: data.id,
       updates: {
         ...data,
@@ -45,19 +41,15 @@ export const Item = ({
   };
 
   const deleteItem = () => {
-    if (!clientId) return;
     dispatch?.({
-      type: 'deleted',
-      clientId,
+      type: 'deleted_item',
       itemId: data.id,
     });
   };
 
   const toggleStatus = () => {
-    if (!clientId) return;
     dispatch?.({
-      type: 'updated',
-      clientId,
+      type: 'updated_item',
       itemId: data.id,
       updates: {
         ...data,

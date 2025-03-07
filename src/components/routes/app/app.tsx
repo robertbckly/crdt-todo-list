@@ -1,23 +1,15 @@
 import { ItemForm } from './item-form/item-form';
 import { ItemList } from './item-list/item-list';
 import { Button } from '../../lib/button';
-import { useData } from '../../../hooks/use-data';
 import { Link } from '../../lib/link';
 import { ROUTES } from '../../../constants/routes';
-import { useEffect, useState } from 'react';
 import { DataProvider } from '../../../libs/data/data-context';
 
 export const App = () => {
-  const [doneInit, setDoneInit] = useState(false);
-  const { isReady, isSyncReady, sync } = useData(); // OLD; replace
-
-  // Init: run sync when ready
-  useEffect(() => {
-    if (!doneInit && isSyncReady) {
-      sync();
-      setDoneInit(true);
-    }
-  }, [doneInit, isSyncReady, sync]);
+  // TODO: replace these
+  const isSyncReady = false;
+  const isReady = true;
+  const sync = () => {};
 
   return (
     <DataProvider>

@@ -10,7 +10,7 @@ export type DragContextValue = {
   dropLineIndex: number;
   hitBoxWidth: number;
   hitBoxOffset: number;
-  dropCallback: null | ((fromIndex: number, toIndex: number) => void);
+  drop: null | ((fromIndex: number, toIndex: number) => void);
 };
 
 export type DragAction =
@@ -20,7 +20,7 @@ export type DragAction =
   | { type: 'updated_hit_box'; width: number; offset: number }
   | {
       type: 'updated_drop_callback';
-      callback: DragContextValue['dropCallback'];
+      callback: DragContextValue['drop'];
     };
 
 export type DragDispatch = ActionDispatch<[action: DragAction]>;

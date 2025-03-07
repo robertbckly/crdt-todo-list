@@ -1,8 +1,8 @@
-import { API_ORIGIN } from '../constants/config';
+import { API_ORIGIN } from '../../../constants/config';
+import { isCrdt } from '../is-crdt';
+import { merge } from '../merge';
 import { useCsrfToken } from './use-csrf-token';
-import { isCrdt } from '../utils/is-crdt';
-import { merge } from '../utils/merge';
-import type { CRDT } from '../types/crdt';
+import type { CRDT } from '../../../types/crdt';
 
 type Params = {
   updateLocalCrdt: (mergedCrdt: CRDT) => void;
@@ -13,7 +13,7 @@ type Return = {
   sync: (localCrdt: CRDT) => Promise<void>;
 };
 
-export const useSync = ({ updateLocalCrdt }: Params): Return => {
+export const useRemoteSync = ({ updateLocalCrdt }: Params): Return => {
   const csrfToken = useCsrfToken();
   const isReady = !!csrfToken;
 

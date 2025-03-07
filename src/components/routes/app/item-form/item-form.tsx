@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Button } from '../../../lib/button';
 import { ItemInput } from '../item/item-input';
 import { useDataDispatch } from '../../../../libs/data/data-context';
-import { useClientId } from '../../../../hooks/use-client-id';
 
 type FormAttributes = React.FormHTMLAttributes<HTMLFormElement>;
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
@@ -11,11 +10,9 @@ type Props = {
   disabled?: boolean;
 };
 
-export const ItemForm = ({ disabled: disabledProp = false }: Props) => {
+export const ItemForm = ({ disabled = false }: Props) => {
   const [hasInputValue, setHasInputValue] = useState(false);
-  const { clientId } = useClientId();
   const dispatch = useDataDispatch();
-  const disabled = disabledProp || !clientId;
 
   const handleInputChange: InputAttributes['onChange'] = (e) => {
     setHasInputValue(!!e.target.value.trim());
@@ -25,9 +22,7 @@ export const ItemForm = ({ disabled: disabledProp = false }: Props) => {
     e.preventDefault();
 
     const form = e.currentTarget;
-    if (!form || !clientId) {
-      return;
-    }
+    if (!form) return;
 
     const formData = new FormData(form);
     const value = formData.get('text') as string;
@@ -35,7 +30,10 @@ export const ItemForm = ({ disabled: disabledProp = false }: Props) => {
       return;
     }
 
-    dispatch?.({ type: 'created', clientId, text: value });
+    dispatch?.({
+      type: 'created_item',
+      text: value,
+    });
     setHasInputValue(false);
     form.reset();
   };

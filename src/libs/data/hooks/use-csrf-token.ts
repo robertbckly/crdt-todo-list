@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { COOKIE_CSRF_TOKEN_KEY } from '../constants/config';
+import { COOKIE_CSRF_TOKEN_KEY } from '../../../constants/config';
 
-type Token = string | null;
-
-export const useCsrfToken = (): Token => {
-  const [token, setToken] = useState<Token>(null);
+export const useCsrfToken = () => {
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const cookieString = document.cookie;
