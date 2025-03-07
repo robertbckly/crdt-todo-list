@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useClientId } from './use-client-id';
 import { LOCAL_STORAGE_CRDT_KEY } from '../../../constants/config';
 import { isCrdt } from '../is-crdt';
 import type { DataContextValue, DataDispatch } from '../types';
@@ -10,8 +9,8 @@ type Params = {
 };
 
 export const useLocalSync = ({ dataState, dispatch }: Params) => {
-  const doneInit = !!Object.keys(dataState.counters).length;
-  const clientId = useClientId();
+  const doneInit = !!Object.keys(dataState.crdt.counters).length;
+  const { clientId } = dataState;
 
   // Init sync (restore)
   useEffect(() => {
@@ -45,7 +44,7 @@ export const useLocalSync = ({ dataState, dispatch }: Params) => {
   // Sync on change
   useEffect(() => {
     if (!doneInit) return;
-    const serialisedData = JSON.stringify(dataState);
+    const serialisedData = JSON.stringify(dataState.crdt);
     localStorage.setItem(LOCAL_STORAGE_CRDT_KEY, serialisedData);
   }, [dataState, doneInit]);
 };

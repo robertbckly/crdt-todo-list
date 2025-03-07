@@ -3,21 +3,23 @@ import { isCrdt } from '../is-crdt';
 import { merge } from '../merge';
 import { useCsrfToken } from './use-csrf-token';
 import type { CRDT } from '../../../types/crdt';
+import { useCallback } from 'react';
+import type { DataContextValue } from '../types';
 
 type Params = {
-  updateLocalCrdt: (mergedCrdt: CRDT) => void;
+  dataState: DataContextValue;
 };
 
 type Return = {
   isReady: boolean;
-  sync: (localCrdt: CRDT) => Promise<void>;
+  sync: () => Promise<void>;
 };
 
-export const useRemoteSync = ({ updateLocalCrdt }: Params): Return => {
+export const useRemoteSync = ({ dataState }: Params): Return => {
   const csrfToken = useCsrfToken();
   const isReady = !!csrfToken;
 
-  const sync: Return['sync'] = async (localCrdt) => {
+  const sync: Return['sync'] = useCallback(async () => {
     if (!isReady) return;
 
     // Get remote CRDT
@@ -43,10 +45,10 @@ export const useRemoteSync = ({ updateLocalCrdt }: Params): Return => {
     //       Can use stringified JSON constant in server config !
 
     // Merge, or fallback to local CRDT
+    const localCrdt = dataState.crdt;
     const newCrdt: CRDT = !isCrdt(remoteCrdt)
       ? localCrdt
       : merge(localCrdt, remoteCrdt);
-    updateLocalCrdt(newCrdt);
 
     // Put remote CRDT
     await fetch(API_ORIGIN, {
@@ -57,7 +59,7 @@ export const useRemoteSync = ({ updateLocalCrdt }: Params): Return => {
         'X-CSRF-Token': csrfToken,
       },
     });
-  };
+  }, [csrfToken, dataState.crdt, isReady]);
 
   return {
     isReady,

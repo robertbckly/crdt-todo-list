@@ -1,6 +1,7 @@
 import type { DataContextValue } from './types';
 
 export const INIT_STATE = {
-  items: [],
-  counters: {},
+  crdt: { items: [], counters: {} },
+  clientId: null,
+  sync: null,
 } as const satisfies DataContextValue;

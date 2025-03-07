@@ -27,7 +27,9 @@ export const ItemList = (props: Props) => {
 };
 
 const BaseItemList = ({ disabled }: Props) => {
-  const { items } = useData();
+  const {
+    crdt: { items },
+  } = useData();
   const { isDragging, dropIndex } = useDrag();
 
   return (

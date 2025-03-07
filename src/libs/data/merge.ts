@@ -1,5 +1,5 @@
-import type { CRDT } from '../types/crdt';
-import type { Item } from '../types/item';
+import type { CRDT } from '../../types/crdt';
+import type { Item } from '../../types/item';
 
 // Helper
 const findItemById = (set: Set<Item>, id: Item['id']): boolean => {

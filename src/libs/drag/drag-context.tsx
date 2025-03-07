@@ -34,12 +34,14 @@ const dragReducer = (
         dropIndex: action.overIndex,
         dropLineIndex: action.overIndex * 2,
       };
+
     case 'dragged':
       return {
         ...state,
         dropIndex: Math.ceil(action.overDropLineIndex / 2),
         dropLineIndex: action.overDropLineIndex,
       };
+
     case 'stopped':
       return {
         ...state,
@@ -49,17 +51,20 @@ const dragReducer = (
         dropIndex: -1,
         dropLineIndex: -1,
       };
+
     case 'updated_hit_box':
       return {
         ...state,
         hitBoxWidth: action.width,
         hitBoxOffset: action.offset,
       };
+
     case 'updated_drop_callback':
       return {
         ...state,
         drop: action.callback,
       };
+
     default:
       return state;
   }
