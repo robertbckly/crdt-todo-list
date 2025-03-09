@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { useCallback, type PropsWithChildren } from 'react';
 import { DragProvider } from '../libs/drag/drag-context';
 import { useDataDispatch } from '../libs/data/data-context';
 
@@ -9,13 +9,16 @@ import { useDataDispatch } from '../libs/data/data-context';
 export const DragItemProvider = ({ children }: PropsWithChildren) => {
   const dataDispatch = useDataDispatch();
 
-  const moveItem = (fromIndex: number, toIndex: number) => {
-    dataDispatch?.({
-      type: 'ordered_item',
-      fromIndex,
-      toIndex,
-    });
-  };
+  const moveItem = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      dataDispatch?.({
+        type: 'ordered_item',
+        fromIndex,
+        toIndex,
+      });
+    },
+    [dataDispatch],
+  );
 
   return <DragProvider onDrop={moveItem}>{children}</DragProvider>;
 };
