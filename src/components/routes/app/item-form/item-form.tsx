@@ -10,7 +10,7 @@ type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 export const ItemForm = () => {
   const [hasInputValue, setHasInputValue] = useState(false);
   const { isReadyForEdit } = useData();
-  const { isDragging } = useDrag(); // TODO: context out-of-scope; see App
+  const { isDragging } = useDrag();
   const dispatch = useDataDispatch();
   const disabled = !isReadyForEdit || isDragging;
 
