@@ -6,6 +6,7 @@ export const dataReducer = (
   action: DataAction,
 ): DataContextValue => {
   // Actions that don't require client ID...
+
   if (action.type === 'updated_client_id') {
     return {
       ...state,
@@ -25,7 +26,6 @@ export const dataReducer = (
 
   const clientId = state.clientId;
   if (!clientId) return state;
-
   const clientCounter = state.crdt.counters[clientId] ?? 0;
 
   switch (action.type) {
@@ -37,26 +37,19 @@ export const dataReducer = (
     }
 
     case 'created_item': {
+      const newCrdt = structuredClone(state.crdt);
+      newCrdt.items.push({
+        id: uuid(),
+        clientId,
+        counter: clientCounter + 1,
+        order: state.crdt.items.length,
+        text: action.text,
+        status: 'open',
+      });
+      newCrdt.counters[clientId] = clientCounter + 1;
       return {
         ...state,
-        crdt: {
-          ...state.crdt,
-          items: [
-            ...state.crdt.items,
-            {
-              id: uuid(),
-              clientId,
-              counter: clientCounter + 1,
-              order: state.crdt.items.length,
-              text: action.text,
-              status: 'open',
-            },
-          ],
-          counters: {
-            ...state.crdt.counters,
-            [clientId]: clientCounter + 1,
-          },
-        },
+        crdt: newCrdt,
       };
     }
 
@@ -64,8 +57,6 @@ export const dataReducer = (
       const itemIndex = state.crdt.items.findIndex(
         (item) => item.id === action.itemId,
       );
-      if (itemIndex === -1) return state;
-
       const existingItem = state.crdt.items[itemIndex];
       if (!existingItem) return state;
 
@@ -74,9 +65,12 @@ export const dataReducer = (
         ...existingItem,
         ...action.updates,
         id: uuid(),
-        clientId, // must overwrite as it's this client's counter being incremented
+        // Must use this client's ID and counter to ensure
+        // other clients take the updated item
+        clientId,
         counter: clientCounter + 1,
       });
+
       return {
         ...state,
         crdt: {
@@ -105,16 +99,20 @@ export const dataReducer = (
     }
 
     case 'ordered_item': {
-      let newItems = [...state.crdt.items];
-      const item = newItems[action.fromIndex];
+      const item = state.crdt.items[action.fromIndex];
       if (!item) return state;
-      const shiftOffset = action.toIndex > action.fromIndex ? -1 : 0;
+
+      const offsetCaused = action.toIndex > action.fromIndex ? -1 : 0;
+      const newIndex = Math.max(action.toIndex + offsetCaused, 0);
+
+      let newItems = [...state.crdt.items];
       newItems.splice(action.fromIndex, 1);
-      newItems.splice(Math.max(action.toIndex + shiftOffset, 0), 0, item);
+      newItems.splice(newIndex, 0, item);
       newItems = newItems.map((item, index) => ({
         ...item,
         order: index,
       }));
+
       return {
         ...state,
         crdt: {
