@@ -1,29 +1,10 @@
 import { Fragment } from 'react';
 import { Item } from '../item/item';
 import { ItemDropLine } from '../item/item-drop-line';
-import { ItemForm } from '../item-form/item-form';
-import { useData, useDataDispatch } from '../../../../libs/data/data-context';
-import { DragProvider, useDrag } from '../../../../libs/drag/drag-context';
+import { useData } from '../../../../libs/data/data-context';
+import { useDrag } from '../../../../libs/drag/drag-context';
 
 export const ItemList = () => {
-  const dataDispatch = useDataDispatch();
-
-  const moveItem = (fromIndex: number, toIndex: number) => {
-    dataDispatch?.({
-      type: 'ordered_item',
-      fromIndex,
-      toIndex,
-    });
-  };
-
-  return (
-    <DragProvider onDrop={moveItem}>
-      <BaseItemList />
-    </DragProvider>
-  );
-};
-
-const BaseItemList = () => {
   const {
     crdt: { items },
     isReadyForEdit,
@@ -32,27 +13,24 @@ const BaseItemList = () => {
   const disabled = !isReadyForEdit || isDragging;
 
   return (
-    <>
-      <ItemForm />
-      <ul aria-label="items" className="flex flex-col rounded border px-2">
-        <ItemDropLine active={dropIndex === 0} />
-        {items
-          .sort((a, b) => a.order - b.order)
-          .map((item, index) => (
-            <Fragment key={item.id}>
-              <Item
-                index={index}
-                data={item}
-                disabled={disabled}
-                isLastInList={index === items.length - 1}
-              />
-              <ItemDropLine
-                // Display beneath item before `dropIndex`
-                active={index === dropIndex - 1}
-              />
-            </Fragment>
-          ))}
-      </ul>
-    </>
+    <ul aria-label="items" className="flex flex-col rounded border px-2">
+      <ItemDropLine active={dropIndex === 0} />
+      {items
+        .sort((a, b) => a.order - b.order)
+        .map((item, index) => (
+          <Fragment key={item.id}>
+            <Item
+              index={index}
+              data={item}
+              disabled={disabled}
+              isLastInList={index === items.length - 1}
+            />
+            <ItemDropLine
+              // Display beneath item before `dropIndex`
+              active={index === dropIndex - 1}
+            />
+          </Fragment>
+        ))}
+    </ul>
   );
 };
