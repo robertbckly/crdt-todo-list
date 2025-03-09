@@ -7,7 +7,8 @@ import {
 import { useAutoScroll } from './hooks/use-auto-scroll';
 import { useDragHelpers } from './hooks/use-drag-helpers';
 import { usePointerDrop } from './hooks/use-pointer-drop';
-import type { DragContextValue, DragAction, DragDispatch } from './types';
+import { dragReducer } from './drag-reducer';
+import type { DragContextValue, DragDispatch } from './types';
 
 const INIT_STATE = {
   isDragging: false,
@@ -19,56 +20,6 @@ const INIT_STATE = {
   hitBoxOffset: 0,
   drop: null,
 } as const satisfies DragContextValue;
-
-const dragReducer = (
-  state: DragContextValue,
-  action: DragAction,
-): DragContextValue => {
-  switch (action.type) {
-    case 'started':
-      return {
-        ...state,
-        isDragging: true,
-        dragType: action.dragType,
-        dragIndex: action.overIndex,
-        dropIndex: action.overIndex,
-        dropLineIndex: action.overIndex * 2,
-      };
-
-    case 'dragged':
-      return {
-        ...state,
-        dropIndex: Math.ceil(action.overDropLineIndex / 2),
-        dropLineIndex: action.overDropLineIndex,
-      };
-
-    case 'stopped':
-      return {
-        ...state,
-        isDragging: false,
-        dragType: null,
-        dragIndex: -1,
-        dropIndex: -1,
-        dropLineIndex: -1,
-      };
-
-    case 'updated_hit_box':
-      return {
-        ...state,
-        hitBoxWidth: action.width,
-        hitBoxOffset: action.offset,
-      };
-
-    case 'updated_drop_callback':
-      return {
-        ...state,
-        drop: action.callback,
-      };
-
-    default:
-      return state;
-  }
-};
 
 const DragContext = createContext<DragContextValue>(INIT_STATE);
 const DragDispatchContext = createContext<DragDispatch | null>(null);
