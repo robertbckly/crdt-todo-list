@@ -11,6 +11,10 @@ const findItemById = (set: Set<Item>, id: Item['id']): boolean => {
   return false;
 };
 
+/**
+ * Opt-OR-Set merge function
+ * https://arxiv.org/pdf/1210.3368
+ */
 export const merge = (ourData: CRDT, theirData: CRDT): CRDT => {
   const ourSet = new Set<Item>(ourData.items);
   const theirSet = new Set<Item>(theirData.items);

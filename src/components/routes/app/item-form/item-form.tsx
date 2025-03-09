@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { Button } from '../../../lib/button';
 import { ItemInput } from '../item/item-input';
-import { useDataDispatch } from '../../../../libs/data/data-context';
+import { useData, useDataDispatch } from '../../../../libs/data/data-context';
+import { useDrag } from '../../../../libs/drag/drag-context';
 
 type FormAttributes = React.FormHTMLAttributes<HTMLFormElement>;
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 
-type Props = {
-  disabled?: boolean;
-};
-
-export const ItemForm = ({ disabled = false }: Props) => {
+export const ItemForm = () => {
   const [hasInputValue, setHasInputValue] = useState(false);
+  const { isReadyForEdit } = useData();
+  const { isDragging } = useDrag(); // TODO: context out-of-scope; see App
   const dispatch = useDataDispatch();
+  const disabled = !isReadyForEdit || isDragging;
 
   const handleInputChange: InputAttributes['onChange'] = (e) => {
     setHasInputValue(!!e.target.value.trim());

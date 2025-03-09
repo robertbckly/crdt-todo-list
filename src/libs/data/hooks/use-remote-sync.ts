@@ -1,25 +1,21 @@
+import { useCallback } from 'react';
 import { API_ORIGIN } from '../../../constants/config';
 import { isCrdt } from '../is-crdt';
 import { merge } from '../merge';
 import { useCsrfToken } from './use-csrf-token';
 import type { CRDT } from '../../../types/crdt';
-import { useCallback } from 'react';
-import type { DataContextValue } from '../types';
+import type { DataContextValue, DataDispatch } from '../types';
 
 type Params = {
   dataState: DataContextValue;
+  dispatch: DataDispatch;
 };
 
-type Return = {
-  isReady: boolean;
-  sync: () => Promise<void>;
-};
-
-export const useRemoteSync = ({ dataState }: Params): Return => {
+export const useRemoteSync = ({ dataState, dispatch }: Params) => {
   const csrfToken = useCsrfToken();
   const isReady = !!csrfToken;
 
-  const sync: Return['sync'] = useCallback(async () => {
+  const sync = useCallback(async () => {
     if (!isReady) return;
 
     // Get remote CRDT
@@ -61,8 +57,10 @@ export const useRemoteSync = ({ dataState }: Params): Return => {
     });
   }, [csrfToken, dataState.crdt, isReady]);
 
-  return {
-    isReady,
-    sync,
-  } as const;
+  if (sync !== dataState.sync) {
+    dispatch({
+      type: 'updated_sync_callback',
+      callback: sync,
+    });
+  }
 };

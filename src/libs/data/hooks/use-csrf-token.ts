@@ -7,11 +7,12 @@ export const useCsrfToken = () => {
   useEffect(() => {
     const cookieString = document.cookie;
     const cookies = cookieString.split(';').map((string) => string.trim());
-    setToken(
-      cookies
-        .find((cookie) => cookie.startsWith(COOKIE_CSRF_TOKEN_KEY))
-        ?.split('=')[1] || null,
-    );
+    const csrfCookieValue = cookies
+      .find((cookie) => cookie.startsWith(COOKIE_CSRF_TOKEN_KEY))
+      ?.split('=')[1];
+    if (csrfCookieValue) {
+      setToken(csrfCookieValue);
+    }
   }, []);
 
   return token;

@@ -5,11 +5,18 @@ import {
   type PropsWithChildren,
 } from 'react';
 import { dataReducer } from './data-reducer';
-import { INIT_STATE } from './init-state';
 import { useLocalSync } from './hooks/use-local-sync';
 import { useRemoteSync } from './hooks/use-remote-sync';
 import { useClientId } from './hooks/use-client-id';
 import { type DataContextValue, type DataDispatch } from './types';
+
+const INIT_STATE = {
+  crdt: { items: [], counters: {} },
+  clientId: null,
+  isReadyForEdit: false,
+  isReadyForSync: false,
+  sync: null,
+} as const satisfies DataContextValue;
 
 const DataContext = createContext<DataContextValue>(INIT_STATE);
 const DataDispatchContext = createContext<DataDispatch | null>(null);
@@ -21,17 +28,8 @@ export const DataProvider = ({ children }: PropsWithChildren) => {
   const [dataState, dispatch] = useReducer(dataReducer, INIT_STATE);
 
   useClientId({ dispatch });
-  useLocalSync({ dataState: dataState, dispatch });
-  const { sync } = useRemoteSync({ dataState });
-
-  // TODO: this depends on `sync` being memoised by its parent hook
-  // ... fix that
-  if (sync !== dataState.sync) {
-    dispatch({
-      type: 'updated_sync_callback',
-      callback: sync,
-    });
-  }
+  useLocalSync({ dataState, dispatch });
+  useRemoteSync({ dataState, dispatch });
 
   return (
     <DataContext.Provider value={dataState}>

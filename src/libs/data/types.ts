@@ -5,6 +5,8 @@ import type { Item } from '../../types/item';
 export type DataContextValue = {
   crdt: CRDT;
   clientId: string | null;
+  isReadyForEdit: boolean;
+  isReadyForSync: boolean;
   sync: (() => Promise<void>) | null;
 };
 

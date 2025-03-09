@@ -5,25 +5,28 @@ export const dataReducer = (
   state: DataContextValue,
   action: DataAction,
 ): DataContextValue => {
+  // Actions that don't require client ID...
   if (action.type === 'updated_client_id') {
     return {
       ...state,
       clientId: action.clientId,
+      isReadyForEdit: true,
     };
   }
-
   if (action.type === 'updated_sync_callback') {
     return {
       ...state,
       sync: action.callback,
+      isReadyForSync: true,
     };
   }
 
+  // Actions that do require client ID...
+
   const clientId = state.clientId;
   if (!clientId) return state;
-  const clientCounter = state.crdt.counters[clientId] ?? 0;
 
-  console.log(action);
+  const clientCounter = state.crdt.counters[clientId] ?? 0;
 
   switch (action.type) {
     case 'restored_data': {

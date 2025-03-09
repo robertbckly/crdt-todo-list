@@ -4,11 +4,7 @@ import { ItemDropLine } from '../item/item-drop-line';
 import { useData, useDataDispatch } from '../../../../libs/data/data-context';
 import { DragProvider, useDrag } from '../../../../libs/drag/drag-context';
 
-type Props = {
-  disabled: boolean;
-};
-
-export const ItemList = (props: Props) => {
+export const ItemList = () => {
   const dataDispatch = useDataDispatch();
 
   const moveItem = (fromIndex: number, toIndex: number) => {
@@ -21,16 +17,18 @@ export const ItemList = (props: Props) => {
 
   return (
     <DragProvider onDrop={moveItem}>
-      <BaseItemList {...props} />
+      <BaseItemList />
     </DragProvider>
   );
 };
 
-const BaseItemList = ({ disabled }: Props) => {
+const BaseItemList = () => {
   const {
     crdt: { items },
+    isReadyForEdit,
   } = useData();
   const { isDragging, dropIndex } = useDrag();
+  const disabled = !isReadyForEdit || isDragging;
 
   return (
     <ul aria-label="items" className="flex flex-col rounded border px-2">
@@ -42,7 +40,7 @@ const BaseItemList = ({ disabled }: Props) => {
             <Item
               index={index}
               data={item}
-              disabled={disabled || isDragging}
+              disabled={disabled}
               isLastInList={index === items.length - 1}
             />
             <ItemDropLine
