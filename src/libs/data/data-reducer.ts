@@ -60,23 +60,21 @@ export const dataReducer = (
       const existingItem = state.crdt.items[itemIndex];
       if (!existingItem) return state;
 
-      const newItems = [...state.crdt.items];
-      newItems.splice(itemIndex, 1, {
+      const newCrdt = structuredClone(state.crdt);
+      newCrdt.items.splice(itemIndex, 1, {
         ...existingItem,
         ...action.updates,
+        // Must make new item from this client to ensure
+        // updates are applied during other clients' merges
         id: uuid(),
-        // Must use this client's ID and counter to ensure
-        // other clients take the updated item
         clientId,
         counter: clientCounter + 1,
       });
+      newCrdt.counters[clientId] = clientCounter + 1;
 
       return {
         ...state,
-        crdt: {
-          ...state.crdt,
-          items: newItems,
-        },
+        crdt: newCrdt,
       };
     }
 
@@ -105,20 +103,23 @@ export const dataReducer = (
       const offsetCaused = action.toIndex > action.fromIndex ? -1 : 0;
       const newIndex = Math.max(action.toIndex + offsetCaused, 0);
 
-      let newItems = [...state.crdt.items];
-      newItems.splice(action.fromIndex, 1);
-      newItems.splice(newIndex, 0, item);
-      newItems = newItems.map((item, index) => ({
+      const newCrdt = structuredClone(state.crdt);
+      newCrdt.items.splice(action.fromIndex, 1);
+      newCrdt.items.splice(newIndex, 0, item);
+      newCrdt.items = newCrdt.items.map((item, index) => ({
         ...item,
         order: index,
+        // Must make new item from this client to ensure
+        // updates are applied during other clients' merges
+        id: uuid(),
+        clientId,
+        counter: clientCounter + 1,
       }));
+      newCrdt.counters[clientId] = clientCounter + 1;
 
       return {
         ...state,
-        crdt: {
-          ...state.crdt,
-          items: newItems,
-        },
+        crdt: newCrdt,
       };
     }
 

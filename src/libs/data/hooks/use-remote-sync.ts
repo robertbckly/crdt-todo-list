@@ -55,9 +55,14 @@ export const useRemoteSync = ({ dataState, dispatch }: Params) => {
         'X-CSRF-Token': csrfToken,
       },
     });
-  }, [csrfToken, dataState.crdt, isReady]);
 
-  if (sync !== dataState.sync) {
+    dispatch({
+      type: 'restored_data',
+      data: newCrdt,
+    });
+  }, [csrfToken, dataState.crdt, dispatch, isReady]);
+
+  if (isReady && sync !== dataState.sync) {
     dispatch({
       type: 'updated_sync_callback',
       callback: sync,
