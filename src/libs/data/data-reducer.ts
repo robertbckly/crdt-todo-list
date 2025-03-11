@@ -66,7 +66,7 @@ export const dataReducer = (
         ...action.updates,
         // Must make new item from this client to ensure
         // updates are applied during other clients' merges
-        id: uuid(),
+        // id: uuid(),
         clientId,
         counter: clientCounter + 1,
       });
@@ -111,7 +111,7 @@ export const dataReducer = (
         order: index,
         // Must make new item from this client to ensure
         // updates are applied during other clients' merges
-        id: uuid(),
+        // id: uuid(),
         clientId,
         counter: clientCounter + 1,
       }));
