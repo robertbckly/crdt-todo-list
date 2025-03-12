@@ -3,7 +3,7 @@ export type Item = {
   id: string;
   clientId: string;
   counter: number;
-  updated: Date;
+  updatedTimeMs: number;
   // Arbitrary properties...
   text: string;
   status: 'open' | 'closed';

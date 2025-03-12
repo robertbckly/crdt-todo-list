@@ -46,9 +46,7 @@ export const merge = (ourData: CRDT, theirData: CRDT): CRDT => {
   u.forEach((outer) => {
     u.forEach((inner) => {
       const sameItem = outer.id === inner.id;
-      const lastWriter =
-        new Date(outer.updated).valueOf() >= new Date(inner.updated).valueOf();
-      // const lastWriter = outer.updated >= inner.updated;
+      const lastWriter = outer.updatedTimeMs >= inner.updatedTimeMs;
 
       // Keep newest version of each duplicate item
       if (sameItem && !lastWriter) {
