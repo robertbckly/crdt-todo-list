@@ -42,6 +42,7 @@ export const dataReducer = (
         id: uuid(),
         clientId,
         counter: clientCounter + 1,
+        updated: new Date(),
         order: state.crdt.items.length,
         text: action.text,
         status: 'open',
@@ -64,11 +65,11 @@ export const dataReducer = (
       newCrdt.items.splice(itemIndex, 1, {
         ...existingItem,
         ...action.updates,
-        // Must make new item from this client to ensure
-        // updates are applied during other clients' merges
-        // id: uuid(),
+        // Item must appear to be new from this client to ensure
+        // updates are picked up during other clients' merging
         clientId,
         counter: clientCounter + 1,
+        updated: new Date(),
       });
       newCrdt.counters[clientId] = clientCounter + 1;
 
@@ -109,11 +110,11 @@ export const dataReducer = (
       newCrdt.items = newCrdt.items.map((item, index) => ({
         ...item,
         order: index,
-        // Must make new item from this client to ensure
-        // updates are applied during other clients' merges
-        // id: uuid(),
+        // Item must appear to be new from this client to ensure
+        // updates are picked up during other clients' merging
         clientId,
         counter: clientCounter + 1,
+        updated: new Date(),
       }));
       newCrdt.counters[clientId] = clientCounter + 1;
 

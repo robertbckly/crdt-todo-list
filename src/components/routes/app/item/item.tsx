@@ -26,6 +26,10 @@ export const Item = ({
   const [isEditing, setIsEditing] = useState(false);
   const dispatch = useDataDispatch();
 
+  if (!isEditing && inputText !== data.text) {
+    setInputText(data.text);
+  }
+
   const startEdit = () => setIsEditing(true);
 
   const endEdit = () => {

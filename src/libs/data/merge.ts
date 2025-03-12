@@ -24,26 +24,42 @@ export const merge = (ourData: CRDT, theirData: CRDT): CRDT => {
     [...ourSet].filter((i) => findItemById(theirSet, i.id)),
   );
 
-  // Exclusively in our set that they haven't seen yet
+  // In our set that they haven't seen yet
   const m1 = new Set<Item>(
     [...ourSet].filter(
-      (i) =>
-        !findItemById(theirSet, i.id) &&
-        i.counter > (theirData.counters[i.clientId] || 0),
+      (i) => i.counter > (theirData.counters[i.clientId] || 0),
     ),
   );
 
-  // Exclusively in their set that we haven't seen yet
+  // In their set that we haven't seen yet
   const m2 = new Set<Item>(
     [...theirSet].filter(
-      (i) =>
-        !findItemById(ourSet, i.id) &&
-        i.counter > (ourData.counters[i.clientId] || 0),
+      (i) => i.counter > (ourData.counters[i.clientId] || 0),
     ),
   );
 
   // Union of all common + new-to-each-side items
   const u = new Set<Item>([...m, ...m1, ...m2]);
+
+  // Identify winning duplicates using last-writer-wins strategy
+  const o = new Set<Item>();
+  u.forEach((outer) => {
+    u.forEach((inner) => {
+      const sameItem = outer.id === inner.id;
+      const lastWriter =
+        new Date(outer.updated).valueOf() >= new Date(inner.updated).valueOf();
+      // const lastWriter = outer.updated >= inner.updated;
+
+      // Keep newest version of each duplicate item
+      if (sameItem && !lastWriter) {
+        o.add(outer);
+      }
+    });
+  });
+
+  // Remove losing duplicates from union
+  const resultSet = new Set<Item>(u);
+  o.forEach((item) => resultSet.delete(item));
 
   // Max every counter
   const counterIds = new Set<string>([
@@ -60,7 +76,7 @@ export const merge = (ourData: CRDT, theirData: CRDT): CRDT => {
 
   // Ta-da
   return {
-    items: Array.from(u),
+    items: Array.from(resultSet),
     counters: newCounters,
   } as const satisfies CRDT;
 };

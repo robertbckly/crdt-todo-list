@@ -6,10 +6,7 @@
 - ~~add bounds to keyboard reordering~~
 - ~~delay before drag start via touch~~
 - ~~refactor data layer to use reducer + context pattern, like drag lib~~
-- resolve critical crdt implementation issues
-  - ideas:
-    - DONE: ~~don't ever update an item's id; this must remain constant for accurate tracking~~
-    - NOW: adapt merge fn to detect internal item changes, identified via i.counter > local counter
+- ~~resolve critical crdt implementation issues~~
 - dnd
   - ignore non-primary pointers when dragging (to allow simultaneous manual scroll on mobile)
   - improve auto-scroll (ux; keyboard scroll; use a time-based loop)
