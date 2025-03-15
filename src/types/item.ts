@@ -3,6 +3,7 @@ export type Item = {
   id: string;
   clientId: string;
   counter: number;
+  createdTimeMs: number;
   updatedTimeMs: number;
   // Arbitrary properties...
   text: string;

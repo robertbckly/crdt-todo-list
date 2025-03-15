@@ -8,6 +8,8 @@
 - ~~refactor data layer to use reducer + context pattern, like drag lib~~
 - ~~resolve critical crdt implementation issues~~
 - ~~resolve all items duplicating when clicking delete~~
+- what happens if remote merge fails, e.g. GET works but PUT fails
+- decide if merge should sit on the server
 - dnd
   - ignore non-primary pointers when dragging (to allow simultaneous manual scroll on mobile)
   - improve auto-scroll (ux; keyboard scroll; use a time-based loop)

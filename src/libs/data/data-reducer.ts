@@ -39,11 +39,13 @@ export const dataReducer = (
 
     case 'created_item': {
       const newCrdt = structuredClone(state.crdt);
+      const createdTimeMs = Date.now();
       newCrdt.items.push({
         id: uuid(),
         clientId,
         counter: clientCounter + 1,
-        updatedTimeMs: Date.now(),
+        createdTimeMs,
+        updatedTimeMs: createdTimeMs,
         order: state.crdt.items.length,
         text: action.text,
         status: 'open',
