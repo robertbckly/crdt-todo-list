@@ -29,10 +29,13 @@ export const useLocalSync = ({ dataState, dispatch }: Params) => {
     let parsedLocalData: unknown;
     try {
       parsedLocalData = JSON.parse(localData);
-      if (!isCrdt(parsedLocalData)) throw Error();
-    } catch {
+      if (!isCrdt(parsedLocalData)) throw Error("Local data isn't CRDT");
+    } catch (error) {
       // TODO: handle corruption...
-      return;
+      // just rethrowing for now to make issues obvious
+      throw Error(
+        error instanceof Error ? error.message : 'Local sync parsing error',
+      );
     }
 
     dispatch({

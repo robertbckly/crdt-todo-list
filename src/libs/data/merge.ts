@@ -59,9 +59,9 @@ export const merge = (ourData: CRDT, theirData: CRDT): CRDT => {
   const resultSet = new Set<Item>(u);
   o.forEach((item) => resultSet.delete(item));
 
-  // Ensure consistent ordering between clients
+  // Ensure consistent ordering between clients (first-writer-wins strategy)
   const orderedResultSet = Array.from(resultSet)
-    .sort((a, b) => b.createdTimeMs - a.createdTimeMs)
+    .sort((a, b) => a.createdTimeMs - b.createdTimeMs)
     .sort((a, b) => a.order - b.order);
 
   // Max every counter

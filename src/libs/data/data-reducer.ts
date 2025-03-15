@@ -15,6 +15,7 @@ export const dataReducer = (
       isReadyForEdit: true,
     };
   }
+
   if (action.type === 'updated_sync_callback') {
     return {
       ...state,

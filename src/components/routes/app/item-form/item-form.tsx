@@ -26,9 +26,7 @@ export const ItemForm = () => {
 
     const formData = new FormData(form);
     const value = formData.get('text') as string;
-    if (!value.trim()) {
-      return;
-    }
+    if (!value.trim()) return;
 
     dispatch?.({
       type: 'created_item',
