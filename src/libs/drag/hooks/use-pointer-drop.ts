@@ -17,7 +17,9 @@ export const usePointerDrop = ({ dragState, dispatch }: Params) => {
       dispatch({ type: 'stopped' });
     };
 
-    document.body.addEventListener('pointerup', doDrop);
-    return () => document.body.removeEventListener('pointerup', doDrop);
+    // Listening on document (not body) ensures event is still received
+    // when pointer is outside of viewport
+    document.addEventListener('pointerup', doDrop);
+    return () => document.removeEventListener('pointerup', doDrop);
   }, [dispatch, dragIndex, dragType, drop, dropIndex, isDragging]);
 };

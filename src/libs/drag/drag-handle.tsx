@@ -16,14 +16,22 @@ export const DragHandle = ({ index }: Props) => {
   const dispatch = useDragDispatch();
 
   const handlePointerDown: ButtonAttributes['onPointerDown'] = async (e) => {
+    if (!e.isPrimary) return;
     e.currentTarget.releasePointerCapture(e.pointerId);
+
     if (e.pointerType === 'touch') {
       await new Promise((resolve) => {
         timeoutRef.current = setTimeout(resolve, DRAG_START_DELAY);
       });
       if (!timeoutRef.current) return;
     }
-    dispatch?.({ type: 'started', dragType: 'pointer', overIndex: index });
+
+    dispatch?.({
+      type: 'started',
+      dragType: 'pointer',
+      pointerId: e.pointerId,
+      overIndex: index,
+    });
   };
 
   const handleCancelDuringDelay = () => {

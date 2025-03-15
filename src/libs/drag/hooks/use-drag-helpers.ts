@@ -7,11 +7,15 @@ type Params = {
 };
 
 export const useDragHelpers = ({ dragState, dispatch }: Params) => {
-  const { isDragging, dragType } = dragState;
+  const { isDragging, dragType, dragPointerId } = dragState;
 
   useEffect(() => {
     const preventDefault = (e: Event) => isDragging && e.preventDefault();
-    const stop = () => dispatch?.({ type: 'stopped' });
+    const cancelOnNewPointer = (e: PointerEvent) => {
+      if (e.pointerId !== dragPointerId) {
+        dispatch?.({ type: 'stopped' });
+      }
+    };
 
     document.body.style.cursor =
       isDragging && dragType === 'pointer' ? 'grabbing' : 'auto';
@@ -21,12 +25,14 @@ export const useDragHelpers = ({ dragState, dispatch }: Params) => {
       passive: false,
     });
 
-    document.body.addEventListener('pointerenter', stop);
+    // Prevent different pointer from taking over drag or causing
+    // drag to become uncontrollable
+    document.body.addEventListener('pointerenter', cancelOnNewPointer);
 
     return () => {
       document.body.style.cursor = 'auto';
       document.body.removeEventListener('touchmove', preventDefault);
-      document.body.removeEventListener('pointerenter', stop);
+      document.body.removeEventListener('pointerenter', cancelOnNewPointer);
     };
-  }, [dispatch, dragType, isDragging]);
+  }, [dispatch, dragPointerId, dragType, isDragging]);
 };

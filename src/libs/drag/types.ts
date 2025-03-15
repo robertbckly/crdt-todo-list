@@ -1,10 +1,13 @@
 import type { ActionDispatch } from 'react';
 
-export type DragType = 'pointer' | 'keyboard';
+type PointerDragType = 'pointer';
+type KeyboardDragType = 'keyboard';
+type DragType = PointerDragType | KeyboardDragType;
 
 export type DragContextValue = {
   isDragging: boolean;
   dragType: DragType | null;
+  dragPointerId: number | null;
   dragIndex: number;
   dropIndex: number;
   dropLineIndex: number;
@@ -14,7 +17,13 @@ export type DragContextValue = {
 };
 
 export type DragAction =
-  | { type: 'started'; dragType: DragType; overIndex: number }
+  | { type: 'started'; dragType: KeyboardDragType; overIndex: number }
+  | {
+      type: 'started';
+      dragType: PointerDragType;
+      pointerId: number;
+      overIndex: number;
+    }
   | { type: 'stopped' }
   | { type: 'dragged'; overDropLineIndex: number }
   | { type: 'updated_hit_box'; width: number; offset: number }
