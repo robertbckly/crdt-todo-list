@@ -35,30 +35,26 @@ export const useRemoteSync = ({ dataState, dispatch }: Params) => {
       // Do nothing
     }
 
-    // TODO: below shouldn't put the local CRDT; remote should always
-    //       start with a blank CRDT... meaning failure to load or
-    //       validate remote is an error!
-    //       Can use stringified JSON constant in server config !
-
     // Merge, or fallback to local CRDT
+    if (!isCrdt(remoteCrdt)) {
+      throw Error("Remote data isn't CRDT");
+    }
     const localCrdt = dataState.crdt;
-    const newCrdt: CRDT = !isCrdt(remoteCrdt)
-      ? localCrdt
-      : merge(localCrdt, remoteCrdt);
+    const mergedCrdt: CRDT = merge(localCrdt, remoteCrdt);
+
+    dispatch({
+      type: 'restored_data',
+      data: mergedCrdt,
+    });
 
     // Put remote CRDT
     await fetch(API_ORIGIN, {
       method: 'PUT',
-      body: JSON.stringify(newCrdt),
+      body: JSON.stringify(mergedCrdt),
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-Token': csrfToken,
       },
-    });
-
-    dispatch({
-      type: 'restored_data',
-      data: newCrdt,
     });
   }, [csrfToken, dataState.crdt, dispatch, isReady]);
 
