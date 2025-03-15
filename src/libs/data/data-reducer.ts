@@ -100,6 +100,7 @@ export const dataReducer = (
           updatedTimeMs: Date.now(),
         }),
       );
+      newCrdt.counters[clientId] = clientCounter + 1;
 
       return {
         ...state,
