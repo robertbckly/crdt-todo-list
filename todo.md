@@ -1,41 +1,34 @@
 # To-do
 
-- ~~status updating~~
-- ~~order updating & persistence~~
-- ~~continue drag updates out of list's bounds~~
-- ~~add bounds to keyboard reordering~~
-- ~~delay before drag start via touch~~
-- ~~refactor data layer to use reducer + context pattern, like drag lib~~
-- ~~resolve critical crdt implementation issues~~
-- ~~resolve all items duplicating when clicking delete~~
-- ~~what happens if remote merge fails, e.g. GET works but PUT fails~~
-- ~~decide if merge should sit on the server (probably in future)~~
+- core functionality
+  - truncation via dialog: "item view"
+  - delete confirm dialog
+  - multiline support
+  - markdown support?
+  - multiple lists
+    - single CRDT; use list IDs
 - dnd
-  - ignore non-primary pointers when dragging (to allow simultaneous manual scroll on mobile)
-  - improve auto-scroll (ux; keyboard scroll; use a time-based loop)
-  - dragging off viewport and entering again is unusable... can't get item 99 to 0
-  - fix drop line not updating when auto scrolling while cursor is still
-  - review a11y usage
-- truncation via dialog: "item view"
-- multiline support
-- markdown support?
-- multiple lists
-  - within single CRDT; use list ID
-
----
-
-- session management
-- design
-- animations
-- a11y
-- dark mode toggle
-- motion toggle
+  - cancel on escape key
+  - improve auto-scroll
+    - refactor
+    - keyboard support
+    - time-based loop
+    - rate increase further into hit zone
+    - make drop line move
+- sessions
+  - automatic session refreshing
+  - graceful logout on invalid session
+  - session management
+- aesthetics
+  - actual design / animations
+  - theme toggle
+- a11y review
+  - motion toggle (if applicable)
 - efficiency review
-  - maybe commute changes; merge on server; compare hashes to know if to pull
-  - could use IndexedDB API?
-- max item size enforced before merge & server-side
-- local pagination
-- encryption
-- automatic session refreshing
-- graceful logout on invalid session
-- TODOs in code: i.e. remote CRDT errors
+  - merge on server?
+  - compare hashes to know if to pull?
+  - use IndexedDB API?
+- security review
+  - enforce max size on client and server
+  - e2e encryption
+- to-do review: go over to-dos in code
