@@ -7,6 +7,8 @@ import { DragHandle } from '../../../../libs/drag/drag-handle';
 import { DragHitBox } from '../../../../libs/drag/drag-hit-box';
 import { type Item as TItem } from '../../../../types/item';
 import { useDataDispatch } from '../../../../libs/data/data-context';
+import { DeleteDialog } from '../dialogs/delete-dialog/delete-dialog';
+import { truncate } from '../../../../utils/truncate';
 
 type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 type Props = {
@@ -24,6 +26,7 @@ export const Item = ({
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const dispatch = useDataDispatch();
 
   if (!isEditing && inputText !== data.text) {
@@ -44,7 +47,11 @@ export const Item = ({
     setIsEditing(false);
   };
 
-  const deleteItem = () => {
+  const deleteItem = (confirmed: boolean = false) => {
+    if (!confirmed) {
+      setIsDeleting(true);
+      return;
+    }
     dispatch?.({
       type: 'deleted_item',
       itemId: data.id,
@@ -69,54 +76,63 @@ export const Item = ({
   };
 
   return (
-    <li
-      className={classnames(
-        'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
-        !isLastInList && 'border-b border-b-black pb-2',
-      )}
-    >
-      <DragHitBox index={index} />
+    <>
+      <li
+        className={classnames(
+          'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
+          !isLastInList && 'border-b border-b-black pb-2',
+        )}
+      >
+        <DragHitBox index={index} />
 
-      {isEditing && (
-        <ItemInput
-          value={inputText}
-          disabled={disabled}
-          autoFocus
-          onChange={(e) => setInputText(e.currentTarget.value)}
-          onKeyDown={handleInputKeyDown}
-          onBlur={endEdit}
-        />
-      )}
-
-      {!isEditing && (
-        <>
-          <DragHandle index={index} />
-
-          <input
-            type="checkbox"
-            checked={data.status === 'closed'}
+        {isEditing && (
+          <ItemInput
+            value={inputText}
             disabled={disabled}
-            onChange={toggleStatus}
+            autoFocus
+            onChange={(e) => setInputText(e.currentTarget.value)}
+            onKeyDown={handleInputKeyDown}
+            onBlur={endEdit}
           />
+        )}
 
-          <ItemText
-            className={`${data.status === 'closed' ? 'text-gray-500 line-through' : ''}`}
-          >
-            {data.text}
-          </ItemText>
+        {!isEditing && (
+          <>
+            <DragHandle index={index} />
 
-          <Button
-            onClick={startEdit}
-            disabled={disabled || data.status === 'closed'}
-          >
-            Edit
-          </Button>
+            <input
+              type="checkbox"
+              checked={data.status === 'closed'}
+              disabled={disabled}
+              onChange={toggleStatus}
+            />
 
-          <Button onClick={deleteItem} disabled={disabled}>
-            Delete
-          </Button>
-        </>
-      )}
-    </li>
+            <ItemText
+              className={`${data.status === 'closed' ? 'text-gray-500 line-through' : ''}`}
+            >
+              {truncate(data.text, 100)}
+            </ItemText>
+
+            <Button
+              onClick={startEdit}
+              disabled={disabled || data.status === 'closed'}
+            >
+              Edit
+            </Button>
+
+            <Button onClick={() => deleteItem()} disabled={disabled}>
+              Delete
+            </Button>
+          </>
+        )}
+      </li>
+
+      <DeleteDialog
+        open={isDeleting}
+        itemName={data.text}
+        onConfirm={() => deleteItem(true)}
+        onClose={() => setIsDeleting(false)}
+      />
+    </>
   );
 };

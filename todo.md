@@ -2,7 +2,8 @@
 
 - core functionality
   - truncation via dialog: "item view"
-  - delete confirm dialog
+  - ~~delete confirm dialog~~
+    - make small and relative to button?
   - multiline support
   - markdown support?
   - multiple lists
