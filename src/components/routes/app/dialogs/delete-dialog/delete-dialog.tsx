@@ -12,7 +12,7 @@ type Props = {
 export const DeleteDialog = ({ open, itemName, onConfirm, onClose }: Props) => {
   return (
     <ModalDialog open={open} onClose={onClose}>
-      <form method="dialog">
+      <form method="dialog" className="p-4">
         <p>
           Are you sure you want to delete{' '}
           <b>&quot;{truncate(itemName, 50)}&quot;</b>?

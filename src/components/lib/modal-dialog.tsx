@@ -5,7 +5,7 @@ type Props = PropsWithChildren<{
   onClose: () => void;
 }>;
 
-export const ModalDialog = ({ open, onClose, children }: Props) => {
+export const ModalDialog = ({ open, children, onClose }: Props) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export const ModalDialog = ({ open, onClose, children }: Props) => {
   return (
     <dialog
       ref={dialogRef}
-      className="m-auto w-full max-w-md rounded bg-white p-4 shadow-lg"
+      className="mx-auto mt-4 w-full max-w-md rounded shadow-lg"
     >
       {children}
     </dialog>
