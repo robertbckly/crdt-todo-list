@@ -1,16 +1,13 @@
 import { useState } from 'react';
 import { Button } from '../../../lib/button';
-import { ItemInput } from './item-input';
-import { ItemText } from './item-text';
+import { ItemEditableText } from './item-editable-text';
 import { classnames } from '../../../../utils/classnames';
 import { DragHandle } from '../../../../libs/drag/drag-handle';
 import { DragHitBox } from '../../../../libs/drag/drag-hit-box';
-import { type Item as TItem } from '../../../../types/item';
 import { useDataDispatch } from '../../../../libs/data/data-context';
 import { DeleteDialog } from '../dialogs/delete-dialog/delete-dialog';
-import { truncate } from '../../../../utils/truncate';
+import { type Item as TItem } from '../../../../types/item';
 
-type InputAttributes = React.InputHTMLAttributes<HTMLInputElement>;
 type Props = {
   index: number;
   data: TItem;
@@ -25,7 +22,7 @@ export const Item = ({
   isLastInList = false,
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const dispatch = useDataDispatch();
 
@@ -33,18 +30,17 @@ export const Item = ({
     setInputText(data.text);
   }
 
-  const startEdit = () => setIsEditing(true);
+  // const startEdit = () => setIsEditing(true);
 
-  const endEdit = () => {
+  const endEdit = (newText: string) => {
     dispatch?.({
       type: 'updated_item',
       itemId: data.id,
       updates: {
         ...data,
-        text: inputText,
+        text: newText,
       },
     });
-    setIsEditing(false);
   };
 
   const deleteItem = (confirmed: boolean = false) => {
@@ -69,11 +65,11 @@ export const Item = ({
     });
   };
 
-  const handleInputKeyDown: InputAttributes['onKeyDown'] = (e) => {
-    if (e.key === 'Escape' || e.key === 'Enter') {
-      endEdit();
-    }
-  };
+  // const handleInputKeyDown: InputAttributes['onKeyDown'] = (e) => {
+  //   if (e.key === 'Escape' || e.key === 'Enter') {
+  //     endEdit();
+  //   }
+  // };
 
   return (
     <>
@@ -84,8 +80,9 @@ export const Item = ({
         )}
       >
         <DragHitBox index={index} />
+        <DragHandle index={index} />
 
-        {isEditing && (
+        {/* {isEditing && (
           <ItemInput
             value={inputText}
             disabled={disabled}
@@ -94,37 +91,25 @@ export const Item = ({
             onKeyDown={handleInputKeyDown}
             onBlur={endEdit}
           />
-        )}
+        )} */}
 
-        {!isEditing && (
-          <>
-            <DragHandle index={index} />
+        <input
+          type="checkbox"
+          checked={data.status === 'closed'}
+          disabled={disabled}
+          onChange={toggleStatus}
+        />
 
-            <input
-              type="checkbox"
-              checked={data.status === 'closed'}
-              disabled={disabled}
-              onChange={toggleStatus}
-            />
+        <ItemEditableText
+          value={data.text}
+          disabled={data.status === 'closed'}
+          onComplete={endEdit}
+          className={`${data.status === 'closed' ? 'text-gray-500 line-through' : ''}`}
+        />
 
-            <ItemText
-              className={`${data.status === 'closed' ? 'text-gray-500 line-through' : ''}`}
-            >
-              {truncate(data.text, 100)}
-            </ItemText>
-
-            <Button
-              onClick={startEdit}
-              disabled={disabled || data.status === 'closed'}
-            >
-              Edit
-            </Button>
-
-            <Button onClick={() => deleteItem()} disabled={disabled}>
-              Delete
-            </Button>
-          </>
-        )}
+        <Button onClick={() => deleteItem()} disabled={disabled}>
+          x
+        </Button>
       </li>
 
       <DeleteDialog

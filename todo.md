@@ -1,13 +1,13 @@
 # To-do
 
 - core functionality
-  - truncation via dialog: "item view"
   - ~~delete confirm dialog~~
     - make small and relative to button?
   - multiline support
   - markdown support?
   - multiple lists
     - single CRDT; use list IDs
+  - prevent loss on navigation
 - dnd
   - cancel on escape key
   - improve auto-scroll
