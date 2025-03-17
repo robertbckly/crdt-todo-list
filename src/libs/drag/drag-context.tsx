@@ -13,6 +13,7 @@ import type { DragContextValue, DragDispatch } from './types';
 const INIT_STATE = {
   isDragging: false,
   dragType: null,
+  dragPointerId: null,
   dragIndex: -1,
   dropIndex: -1,
   dropLineIndex: -1,
