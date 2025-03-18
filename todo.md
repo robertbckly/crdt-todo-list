@@ -1,13 +1,19 @@
 # To-do
 
 - core functionality
-  - ~~delete confirm dialog~~
-    - make small and relative to button?
-  - multiline support
-  - markdown support?
-  - multiple lists
+  - ~~set click-to-edit cursor / cursor position~~
+  - fix excessive rendering of item / editable text (esp. when dragging)
+  - disable spellcheck when not editing
+  - make delete dialog relative to button
+  - make new item form consistent with items
+  - support line breaks
+  - prevent data loss on browser navigation
+  - design & aesthetics
+  - support markdown?
+  - design & implement multiple list solution
     - single CRDT; use list IDs
-  - prevent loss on navigation
+    - kanban?
+    - drag between?
 - dnd
   - cancel on escape key
   - improve auto-scroll
