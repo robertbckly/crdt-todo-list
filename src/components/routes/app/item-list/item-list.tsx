@@ -13,7 +13,7 @@ export const ItemList = () => {
   const disabled = !isReadyForEdit || isDragging;
 
   return (
-    <ul aria-label="items" className="flex flex-col rounded border px-2">
+    <ul aria-label="items" className="flex flex-col rounded px-2">
       <ItemDropLine active={dropIndex === 0} />
       {items
         .sort((a, b) => a.order - b.order)

@@ -19,7 +19,7 @@ export const Item = ({
   index,
   data,
   disabled = false,
-  isLastInList = false,
+  // isLastInList = false,
 }: Props) => {
   const [inputText, setInputText] = useState(data.text);
   const [isEditing] = useState(false);
@@ -76,7 +76,8 @@ export const Item = ({
       <li
         className={classnames(
           'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
-          !isLastInList && 'border-b border-b-black pb-2',
+          'hover:shadow-sm'
+          // !isLastInList && 'border-b border-b-black pb-2',
         )}
       >
         <DragHitBox index={index} />

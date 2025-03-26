@@ -2,8 +2,10 @@
 
 - core functionality
   - ~~set click-to-edit cursor / cursor position~~
+  - build out what i designed in freeform <<<
   - fix excessive rendering of item / editable text (esp. when dragging)
   - disable spellcheck when not editing
+  - require cmd + enter for new lines
   - make delete dialog relative to button
   - make new item form consistent with items
   - support line breaks
