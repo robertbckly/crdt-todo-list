@@ -1,24 +1,24 @@
-import { ROUTES } from '../../../../constants/routes';
-import { useData } from '../../../../libs/data/data-context';
-import { useDrag } from '../../../../libs/drag/drag-context';
-import { Button } from '../../../lib/button';
-import { Link } from '../../../lib/link';
+import { useState } from 'react';
+import { DefaultItems } from './mode-items/default-items';
+import { DeleteItems } from './mode-items/delete-items';
 
-export const Toolbar = () => {
-  const { isReadyForSync, sync } = useData();
-  const { isDragging } = useDrag();
+type Props = {
+  onCreateStart: () => void;
+};
 
-  return isReadyForSync ? (
-    <Button
-      disabled={!isReadyForSync || isDragging}
-      onClick={sync || undefined}
-      className="self-end"
-    >
-      Sync
-    </Button>
-  ) : (
-    <Link to={ROUTES.login} className="self-start">
-      Login
-    </Link>
+export const Toolbar = ({ onCreateStart }: Props) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const mode = isDeleting ? 'delete' : 'default';
+
+  return (
+    <div role="menubar">
+      {mode === 'default' && (
+        <DefaultItems
+          onCreateStart={onCreateStart}
+          onDeleteStart={() => setIsDeleting(true)}
+        />
+      )}
+      {mode === 'delete' && <DeleteItems onExit={() => setIsDeleting(false)} />}
+    </div>
   );
 };
