@@ -1,6 +1,6 @@
-import { truncate } from '../../../../../utils/truncate';
-import { Button } from '../../../../lib/button';
-import { ModalDialog } from '../../../../lib/modal-dialog';
+import { truncate } from '../../../../utils/truncate';
+import { Button } from '../../../lib/button';
+import { ModalDialog } from '../../../lib/modal-dialog';
 
 type Props = {
   open: boolean;

@@ -5,7 +5,7 @@ type Props = {
   onExit: () => void;
 };
 
-export const DeleteItems = ({ onExit }: Props) => (
+export const DeleteMode = ({ onExit }: Props) => (
   <div className="flex flex-row justify-end gap-2">
     <ToolbarButton name="Exit delete-mode" onClick={onExit}>
       <CrossIcon />

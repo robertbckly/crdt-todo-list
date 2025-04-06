@@ -12,8 +12,11 @@ export const App = () => {
     <DataProvider>
       <DragItemProvider>
         <main className="mx-auto flex max-w-md flex-col gap-2 p-4">
-          {!isCreating && <Toolbar onCreateStart={() => setIsCreating(true)} />}
-          {isCreating && <ItemForm onClose={() => setIsCreating(false)} />}
+          {isCreating ? (
+            <ItemForm onClose={() => setIsCreating(false)} />
+          ) : (
+            <Toolbar onCreateStart={() => setIsCreating(true)} />
+          )}
           <ItemList />
         </main>
       </DragItemProvider>

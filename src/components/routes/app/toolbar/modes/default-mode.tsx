@@ -7,8 +7,8 @@ type Props = {
   onDeleteStart: () => void;
 };
 
-export const DefaultItems = ({ onCreateStart, onDeleteStart }: Props) => (
-  <div className="flex justify-end gap-2">
+export const DefaultMode = ({ onCreateStart, onDeleteStart }: Props) => (
+  <div className="flex flex-row justify-end gap-2">
     <ToolbarButton name="Add item" onClick={onCreateStart}>
       <AddIcon />
     </ToolbarButton>

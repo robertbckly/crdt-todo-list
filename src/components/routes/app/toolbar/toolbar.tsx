@@ -1,24 +1,25 @@
 import { useState } from 'react';
-import { DefaultItems } from './mode-items/default-items';
-import { DeleteItems } from './mode-items/delete-items';
+import { DefaultMode } from './modes/default-mode';
+import { DeleteMode } from './modes/delete-mode';
+
+type Mode = 'default' | 'delete';
 
 type Props = {
   onCreateStart: () => void;
 };
 
 export const Toolbar = ({ onCreateStart }: Props) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const mode = isDeleting ? 'delete' : 'default';
+  const [mode, setMode] = useState<Mode>('default');
 
   return (
     <div role="menubar">
       {mode === 'default' && (
-        <DefaultItems
+        <DefaultMode
           onCreateStart={onCreateStart}
-          onDeleteStart={() => setIsDeleting(true)}
+          onDeleteStart={() => setMode('delete')}
         />
       )}
-      {mode === 'delete' && <DeleteItems onExit={() => setIsDeleting(false)} />}
+      {mode === 'delete' && <DeleteMode onExit={() => setMode('default')} />}
     </div>
   );
 };

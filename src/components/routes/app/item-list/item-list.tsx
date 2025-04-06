@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
-import { Item } from '../item/item';
-import { ItemDropLine } from '../item/item-drop-line';
+import { Item } from './item';
+import { ItemDropLine } from './item-drop-line';
 import { useData } from '../../../../libs/data/data-context';
 import { useDrag } from '../../../../libs/drag/drag-context';
 
@@ -23,7 +23,7 @@ export const ItemList = () => {
               index={index}
               data={item}
               disabled={disabled}
-              isLastInList={index === items.length - 1}
+              isLastItem={index === items.length - 1}
             />
             <ItemDropLine
               // Display beneath item before `dropIndex`

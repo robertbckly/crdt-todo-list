@@ -1,4 +1,4 @@
-import { type ComponentProps } from 'react';
+import { useRef, type ComponentProps } from 'react';
 import { useData, useDataDispatch } from '../../../../libs/data/data-context';
 import { useDrag } from '../../../../libs/drag/drag-context';
 import { Button } from '../../../lib/button';
@@ -15,8 +15,14 @@ type Props = {
 export const ItemForm = ({ onClose }: Props) => {
   const { isReadyForEdit } = useData();
   const { isDragging } = useDrag();
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDataDispatch();
   const disabled = !isReadyForEdit || isDragging;
+
+  const handleTextInput = (value: string) => {
+    if (!hiddenInputRef.current) return;
+    hiddenInputRef.current.value = value;
+  };
 
   const handleSubmit: ComponentProps<'form'>['onSubmit'] = (e) => {
     e.preventDefault();
@@ -44,15 +50,13 @@ export const ItemForm = ({ onClose }: Props) => {
       onSubmit={handleSubmit}
       className="flex items-center gap-2"
     >
-      <MultilineInput
-        isFormInput
-        formInputName={TEXT_INPUT_NAME}
-        autoFocus
-        disabled={disabled}
-      />
+      <input ref={hiddenInputRef} type="hidden" name={TEXT_INPUT_NAME} />
+      <MultilineInput autoFocus disabled={disabled} onBlur={handleTextInput} />
+
       <Button type="submit" disabled={disabled}>
         <TickIcon />
       </Button>
+
       <Button type="button" disabled={disabled} onClick={onClose}>
         <CrossIcon />
       </Button>

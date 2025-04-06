@@ -4,7 +4,7 @@ import { classnames } from '../../../../utils/classnames';
 import { DragHandle } from '../../../../libs/drag/drag-handle';
 import { DragHitBox } from '../../../../libs/drag/drag-hit-box';
 import { useDataDispatch } from '../../../../libs/data/data-context';
-import { DeleteDialog } from '../dialogs/delete-dialog/delete-dialog';
+import { DeleteDialog } from '../dialogs/delete-dialog';
 import { MultilineInput } from '../../../lib/multiline-input/multiline-input';
 import { BinIcon } from '../../../lib/icons/bin-icon';
 import { type Item as TItem } from '../../../../types/item';
@@ -13,7 +13,7 @@ type Props = {
   index: number;
   data: TItem;
   disabled?: boolean;
-  isLastInList?: boolean;
+  isLastItem?: boolean;
 };
 
 export const Item = ({ index, data, disabled = false }: Props) => {
@@ -42,8 +42,8 @@ export const Item = ({ index, data, disabled = false }: Props) => {
     });
   };
 
-  const deleteItem = (confirmed: boolean = false) => {
-    if (!confirmed) {
+  const deleteItem = (isConfirmed: boolean = false) => {
+    if (!isConfirmed) {
       setIsDeleting(true);
       return;
     }
@@ -55,12 +55,7 @@ export const Item = ({ index, data, disabled = false }: Props) => {
 
   return (
     <>
-      <li
-        className={classnames(
-          'relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none',
-          'hover:shadow-sm',
-        )}
-      >
+      <li className="relative flex items-center gap-2 border-y-2 border-transparent py-2 select-none hover:shadow-sm">
         <DragHitBox index={index} />
         <DragHandle index={index} />
 
