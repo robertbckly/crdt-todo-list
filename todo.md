@@ -1,9 +1,6 @@
 # To-do
 
 - core functionality
-  - switch to meta + enter for new line
-  - fix multiline-input border click issue
-  - add direct drag
   - make delete dialog relative to button
   - make new item form consistent with items
   - preserve line breaks between save/read
@@ -19,10 +16,10 @@
   - cancel on escape key
   - improve auto-scroll
     - refactor
+    - make drop line move !!
     - keyboard support
     - time-based loop
     - rate increase further into hit zone
-    - make drop line move
 - sessions
   - automatic session refreshing
   - graceful logout on invalid session

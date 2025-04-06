@@ -6,6 +6,7 @@ type Props = {
   initialValue?: string;
   autoFocus?: boolean;
   disabled?: boolean;
+  id?: string;
   className?: string;
   onBlur?: (value: string) => void;
 };
@@ -14,6 +15,7 @@ export const MultilineInput = ({
   initialValue = '',
   autoFocus = false,
   disabled = false,
+  id,
   className,
   onBlur,
 }: Props) => {
@@ -33,10 +35,15 @@ export const MultilineInput = ({
   };
 
   const handlePointerDown: ComponentProps<'div'>['onPointerDown'] = (e) => {
-    if (!isFocused) {
-      e.preventDefault();
-      focus();
-    }
+    if (disabled || isFocused) return;
+    e.preventDefault();
+    // focus();
+  };
+
+  const handlePointerUp: ComponentProps<'div'>['onPointerUp'] = (e) => {
+    if (disabled || isFocused) return;
+    e.preventDefault();
+    focus();
   };
 
   const handleFocus: ComponentProps<'div'>['onFocus'] = (e) => {
@@ -50,6 +57,7 @@ export const MultilineInput = ({
   };
 
   const handleKeyDown: ComponentProps<'div'>['onKeyDown'] = (e) => {
+    if (disabled) return;
     const isSubmitShortcut = e.metaKey && e.key === 'Enter';
     if (isSubmitShortcut || e.key === 'Escape') {
       inputRef.current?.blur();
@@ -66,11 +74,13 @@ export const MultilineInput = ({
       onFocus={handleFocus}
       onBlur={handleBlur}
       onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onKeyDown={handleKeyDown}
+      id={id}
       className={classnames(
         className,
-        'flex-auto',
-        !isFocused && 'cursor-pointer hover:bg-gray-200',
+        'w-full px-2 py-1',
+        !isFocused && !disabled && 'cursor-pointer hover:bg-gray-100',
       )}
     >
       {staticInitialValue}

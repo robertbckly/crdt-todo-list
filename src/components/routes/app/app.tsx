@@ -1,22 +1,18 @@
-import { useState } from 'react';
 import { DragItemProvider } from '../../../context/drag-item-provider';
 import { DataProvider } from '../../../libs/data/data-context';
 import { ItemList } from './item-list/item-list';
 import { Toolbar } from './toolbar/toolbar';
-import { ItemForm } from './item-create-form/item-create-form';
+import { ItemCreateForm } from './item-create-form/item-create-form';
+import { useMode } from '../../../context/mode-provider';
 
 export const App = () => {
-  const [isCreating, setIsCreating] = useState(false);
-
+  const mode = useMode();
   return (
     <DataProvider>
       <DragItemProvider>
-        <main className="mx-auto flex max-w-md flex-col gap-2 p-4">
-          {isCreating ? (
-            <ItemForm onClose={() => setIsCreating(false)} />
-          ) : (
-            <Toolbar onCreateStart={() => setIsCreating(true)} />
-          )}
+        <main className="mx-auto flex max-w-md flex-col gap-2 p-4 pt-0">
+          {mode !== 'create' && <Toolbar />}
+          {mode === 'create' && <ItemCreateForm />}
           <ItemList />
         </main>
       </DragItemProvider>

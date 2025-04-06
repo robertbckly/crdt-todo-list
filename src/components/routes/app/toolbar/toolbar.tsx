@@ -1,25 +1,15 @@
-import { useState } from 'react';
 import { DefaultMode } from './modes/default-mode';
 import { DeleteMode } from './modes/delete-mode';
+import { ReorderMode } from './modes/reorder-mode';
+import { useMode } from '../../../../context/mode-provider';
 
-type Mode = 'default' | 'delete';
-
-type Props = {
-  onCreateStart: () => void;
-};
-
-export const Toolbar = ({ onCreateStart }: Props) => {
-  const [mode, setMode] = useState<Mode>('default');
-
+export const Toolbar = () => {
+  const mode = useMode();
   return (
-    <div role="menubar">
-      {mode === 'default' && (
-        <DefaultMode
-          onCreateStart={onCreateStart}
-          onDeleteStart={() => setMode('delete')}
-        />
-      )}
-      {mode === 'delete' && <DeleteMode onExit={() => setMode('default')} />}
+    <div role="menubar" className="sticky top-0 z-[1] bg-white py-2">
+      {mode === 'default' && <DefaultMode />}
+      {mode === 'delete' && <DeleteMode />}
+      {mode === 'order' && <ReorderMode />}
     </div>
   );
 };

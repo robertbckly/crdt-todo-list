@@ -5,18 +5,16 @@ import { Button } from '../../../lib/button';
 import { TickIcon } from '../../../lib/icons/tick-icon';
 import { CrossIcon } from '../../../lib/icons/cross-icon';
 import { MultilineInput } from '../../../lib/multiline-input/multiline-input';
+import { useSetMode } from '../../../../context/mode-provider';
 
 const TEXT_INPUT_NAME = 'text';
 
-type Props = {
-  onClose: () => void;
-};
-
-export const ItemForm = ({ onClose }: Props) => {
+export const ItemCreateForm = () => {
   const { isReadyForEdit } = useData();
   const { isDragging } = useDrag();
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDataDispatch();
+  const setMode = useSetMode();
   const disabled = !isReadyForEdit || isDragging;
 
   const handleTextInput = (value: string) => {
@@ -40,7 +38,7 @@ export const ItemForm = ({ onClose }: Props) => {
     });
 
     form.reset();
-    onClose();
+    setMode('default');
   };
 
   return (
@@ -57,7 +55,11 @@ export const ItemForm = ({ onClose }: Props) => {
         <TickIcon />
       </Button>
 
-      <Button type="button" disabled={disabled} onClick={onClose}>
+      <Button
+        type="button"
+        disabled={disabled}
+        onClick={() => setMode('default')}
+      >
         <CrossIcon />
       </Button>
     </form>
