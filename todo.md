@@ -1,16 +1,15 @@
 # To-do
 
 - core functionality
-  - ~~set click-to-edit cursor / cursor position~~
-  - build out what i designed in freeform <<<
-  - fix excessive rendering of item / editable text (esp. when dragging)
-  - disable spellcheck when not editing
-  - require cmd + enter for new lines
+  - switch to meta + enter for new line
+  - fix multiline-input border click issue
+  - add direct drag
   - make delete dialog relative to button
   - make new item form consistent with items
-  - support line breaks
+  - preserve line breaks between save/read
   - prevent data loss on browser navigation
-  - design & aesthetics
+  - review props (don't use element props; make each type precise)
+  - improve design & aesthetics
   - support markdown?
   - design & implement multiple list solution
     - single CRDT; use list IDs
