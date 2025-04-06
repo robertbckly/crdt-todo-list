@@ -5,3 +5,8 @@ body,
 #root {
   min-height: 100dvh;
 }
+
+/* Prevent button icons from breaking with interactions */
+svg {
+  pointer-events: none;
+}

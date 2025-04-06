@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { classnames } from '../../utils/classnames';
 import { useDrag, useDragDispatch } from './drag-context';
+import { MoveIcon } from '../../components/lib/icons/move-icon';
 
 type ButtonAttributes = React.ButtonHTMLAttributes<HTMLButtonElement>;
 type Props = {
@@ -78,9 +79,11 @@ export const DragHandle = ({ index }: Props) => {
       onPointerCancel={handleCancelDuringDelay}
       onKeyDown={handleKeyDown}
       className={classnames(
-        'h-8 w-8 shrink-0 cursor-pointer rounded bg-black active:cursor-grabbing',
+        'h-8 w-8 shrink-0 cursor-pointer rounded hover:opacity-100 active:cursor-grabbing',
         isDragging && index === dragIndex ? 'opacity-100' : 'opacity-50',
       )}
-    />
+    >
+      <MoveIcon />
+    </button>
   );
 };
