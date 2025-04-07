@@ -52,6 +52,8 @@ export const MultilineInput = ({
   };
 
   const handleBlur: ComponentProps<'div'>['onBlur'] = (e) => {
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
     onBlur?.(e.currentTarget.innerText);
     setIsFocused(false);
   };
