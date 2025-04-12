@@ -42,10 +42,7 @@ export const MultilineInput = ({
         return;
       }
       // Blur is complete once input no longer active
-      if (document.activeElement !== input) {
-        console.log('done blur');
-        onBlur?.(input.innerText);
-      }
+      onBlur?.(input.innerText);
     };
 
     // Note: event must capture for iPad fix to work
