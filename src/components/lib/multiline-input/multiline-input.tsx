@@ -29,8 +29,8 @@ export const MultilineInput = ({
     }
   }, [autoFocus]);
 
-  // Customised blur event-listener with capturing is required
-  // to ensure hiding virtual keyboard on iPad actually blurs
+  // Customised blur event-listener is required to ensure
+  // hiding virtual keyboard on iPad actually blurs
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
@@ -45,7 +45,14 @@ export const MultilineInput = ({
       onBlur?.(input.innerText);
     };
 
-    // Note: event must capture for iPad fix to work
+    // Note 1: I'm using capture to ensure the iPad fix works, as I think
+    // hiding the virtual keyboard might be blurring the inner text-node,
+    // and because blur events don't bubble, the event listener on the
+    // parent contenteditable div isn't fired (something like this, anyway).
+    // ---
+    // Note 2: it *does* seem as though Safari and Chrome bubble the blur
+    // event when it's added via `addEventListener()` (i.e. not via attribute),
+    // but I don't trust that (seems non-compliant), so capture is a safer bet.
     input.addEventListener('blur', blur, { capture: true });
     return () => input.removeEventListener('blur', blur, { capture: true });
   }, [onBlur]);
