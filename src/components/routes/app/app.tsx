@@ -10,7 +10,7 @@ export const App = () => {
   return (
     <DataProvider>
       <DragItemProvider>
-        <main className="mx-auto flex max-w-md flex-col gap-2 p-4 pt-0">
+        <main className="mx-auto flex max-w-md flex-col gap-2 p-2 pt-0 md:p-4">
           {mode !== 'create' && <Toolbar />}
           {mode === 'create' && <ItemCreateForm />}
           <ItemList />

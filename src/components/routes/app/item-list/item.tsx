@@ -62,22 +62,34 @@ export const Item = ({ index, data, disabled = false }: Props) => {
       <li
         aria-labelledby={TEXT_INPUT_ID}
         className={classnames(
-          'relative flex items-center gap-2 rounded-md border-transparent py-1',
-          mode !== 'default' && 'hover:bg-gray-100',
+          'relative flex items-center rounded-md border-transparent p-1.5 pl-0',
+          'hover:bg-gray-100',
         )}
       >
         <DragHitBox index={index} />
 
-        <input
-          type="checkbox"
-          checked={data.status === 'closed'}
-          disabled={disabled || mode !== 'default'}
-          onChange={toggleStatus}
-          className="ml-2 scale-125"
-        />
+        <div className="flex h-8 shrink-0 basis-8 items-center justify-center">
+          {mode === 'default' && (
+            <input
+              type="checkbox"
+              checked={data.status === 'closed'}
+              disabled={disabled || mode !== 'default'}
+              onChange={toggleStatus}
+              className="scale-125"
+            />
+          )}
 
-        {/* Extra container needed to prevent clicking to focus outside of bounds */}
-        <div className="mx-1 flex-auto">
+          {mode === 'delete' && (
+            <Button onClick={() => deleteItem()} disabled={disabled}>
+              <BinIcon />
+            </Button>
+          )}
+
+          {mode === 'order' && <DragHandle index={index} />}
+        </div>
+
+        {/* Note: extra container needed to prevent clicking to focus outside of bounds */}
+        <div className="flex-auto">
           <MultilineInput
             initialValue={data.text}
             disabled={mode !== 'default' || data.status === 'closed'}
@@ -89,19 +101,6 @@ export const Item = ({ index, data, disabled = false }: Props) => {
             )}
           />
         </div>
-
-        {mode === 'order' && <DragHandle index={index} />}
-
-        {mode === 'delete' && (
-          <Button onClick={() => deleteItem()} disabled={disabled}>
-            <BinIcon />
-          </Button>
-        )}
-
-        {mode !== 'order' && mode !== 'delete' && (
-          // Placeholder to prevent layout re-flow on mode change
-          <div className="w-[32px] shrink-0 p-2" />
-        )}
       </li>
 
       <DeleteDialog
