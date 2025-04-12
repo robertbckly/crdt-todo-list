@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { focusAtEnd } from './focus-at-end';
 import { classnames } from '../../../utils/classnames';
 
 type Props = {
@@ -20,47 +19,44 @@ export const MultilineInput = ({
   onBlur,
 }: Props) => {
   const inputRef = useRef<HTMLParagraphElement>(null);
+  const doneAutofocusRef = useRef(false);
   const [staticInitialValue] = useState(initialValue);
-  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
-    if (autoFocus && !isFocused) {
-      focus();
+    if (autoFocus && !doneAutofocusRef.current && inputRef.current) {
+      inputRef.current.focus();
+      doneAutofocusRef.current = true;
     }
-  }, [autoFocus, isFocused]);
+  }, [autoFocus]);
 
-  const focus = () => {
-    focusAtEnd(inputRef.current);
-    setIsFocused(true);
-  };
+  // Customised blur event-listener with capturing is required
+  // to ensure hiding virtual keyboard on iPad actually blurs
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
 
-  const handlePointerDown: ComponentProps<'div'>['onPointerDown'] = (e) => {
-    if (disabled || isFocused) return;
-    e.preventDefault();
-    // focus();
-  };
+    const blur = () => {
+      // Force blur required for iPad after virtual-keyboard hide
+      if (document.activeElement === input) {
+        input.blur();
+        return;
+      }
+      // Blur is complete once input no longer active
+      if (document.activeElement !== input) {
+        console.log('done blur');
+        onBlur?.(input.innerText);
+      }
+    };
 
-  const handlePointerUp: ComponentProps<'div'>['onPointerUp'] = (e) => {
-    if (disabled || isFocused) return;
-    e.preventDefault();
-    focus();
-  };
-
-  const handleFocus: ComponentProps<'div'>['onFocus'] = (e) => {
-    e.preventDefault();
-    focus();
-  };
-
-  const handleBlur: ComponentProps<'div'>['onBlur'] = (e) => {
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    onBlur?.(e.currentTarget.innerText);
-    setIsFocused(false);
-  };
+    // Note: event must capture for iPad fix to work
+    input.addEventListener('blur', blur, { capture: true });
+    return () => input.removeEventListener('blur', blur, { capture: true });
+  }, [onBlur]);
 
   const handleKeyDown: ComponentProps<'div'>['onKeyDown'] = (e) => {
     if (disabled) return;
     const isSubmitShortcut = e.metaKey && e.key === 'Enter';
+
     if (isSubmitShortcut || e.key === 'Escape') {
       inputRef.current?.blur();
     }
@@ -68,21 +64,16 @@ export const MultilineInput = ({
 
   return (
     <div
+      id={id}
       ref={inputRef}
       role="textbox"
       contentEditable={disabled ? false : 'plaintext-only'}
       suppressContentEditableWarning
-      spellCheck={isFocused}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
       onKeyDown={handleKeyDown}
-      id={id}
       className={classnames(
         className,
-        'w-full px-2 py-1',
-        !isFocused && !disabled && 'cursor-pointer hover:bg-gray-100',
+        'overflow-x-hidden px-1.5',
+        !disabled && 'not-focus:cursor-pointer hover:bg-gray-200',
       )}
     >
       {staticInitialValue}
