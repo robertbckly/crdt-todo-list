@@ -5,7 +5,7 @@ import { DragHandle } from '../../../../libs/drag/drag-handle';
 import { DragHitBox } from '../../../../libs/drag/drag-hit-box';
 import { useDataDispatch } from '../../../../libs/data/data-context';
 import { DeleteDialog } from '../dialogs/delete-dialog';
-import { MultilineInput } from '../../../lib/multiline-input/multiline-input';
+import { MultilineInput } from '../../../lib/multiline-input';
 import { BinIcon } from '../../../lib/icons/bin-icon';
 import { type Item as TItem } from '../../../../types/item';
 import { useMode } from '../../../../context/mode-provider';

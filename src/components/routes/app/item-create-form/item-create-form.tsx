@@ -4,7 +4,7 @@ import { useDrag } from '../../../../libs/drag/drag-context';
 import { Button } from '../../../lib/button';
 import { TickIcon } from '../../../lib/icons/tick-icon';
 import { CrossIcon } from '../../../lib/icons/cross-icon';
-import { MultilineInput } from '../../../lib/multiline-input/multiline-input';
+import { MultilineInput } from '../../../lib/multiline-input';
 import { useSetMode } from '../../../../context/mode-provider';
 
 const TEXT_INPUT_NAME = 'text';

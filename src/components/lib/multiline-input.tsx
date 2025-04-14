@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ComponentProps } from 'react';
-import { classnames } from '../../../utils/classnames';
+import { classnames } from '../../utils/classnames';
 
 type Props = {
   initialValue?: string;
