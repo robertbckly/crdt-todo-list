@@ -5,7 +5,7 @@ import {
   type PropsWithChildren,
 } from 'react';
 
-type Mode = 'default' | 'create' | 'delete' | 'order';
+type Mode = 'default' | 'create' | 'update' | 'delete' | 'order';
 type SetMode = (newMode: Mode) => void;
 
 const ModeContext = createContext<Mode>('default');

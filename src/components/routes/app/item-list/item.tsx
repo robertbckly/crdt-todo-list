@@ -69,7 +69,7 @@ export const Item = ({ index, data, disabled = false }: Props) => {
         <DragHitBox index={index} />
 
         <div className="flex h-8 shrink-0 basis-8 items-center justify-center">
-          {mode === 'default' && (
+          {mode !== 'delete' && mode !== 'order' && (
             <input
               type="checkbox"
               checked={data.status === 'closed'}
@@ -80,7 +80,11 @@ export const Item = ({ index, data, disabled = false }: Props) => {
           )}
 
           {mode === 'delete' && (
-            <Button onClick={() => deleteItem()} disabled={disabled}>
+            <Button
+              aria-label={`Delete ${data.text}`}
+              disabled={disabled}
+              onClick={() => deleteItem()}
+            >
               <BinIcon />
             </Button>
           )}
@@ -92,7 +96,8 @@ export const Item = ({ index, data, disabled = false }: Props) => {
         <div className="flex-auto">
           <MultilineInput
             initialValue={data.text}
-            disabled={mode !== 'default' || data.status === 'closed'}
+            readOnly={mode !== 'update'}
+            disabled={data.status === 'closed'}
             onBlur={updateText}
             id={TEXT_INPUT_ID}
             className={classnames(

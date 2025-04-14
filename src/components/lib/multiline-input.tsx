@@ -4,6 +4,7 @@ import { classnames } from '../../utils/classnames';
 type Props = {
   initialValue?: string;
   autoFocus?: boolean;
+  readOnly?: boolean;
   disabled?: boolean;
   id?: string;
   className?: string;
@@ -13,6 +14,7 @@ type Props = {
 export const MultilineInput = ({
   initialValue = '',
   autoFocus = false,
+  readOnly = false,
   disabled = false,
   id,
   className,
@@ -70,14 +72,14 @@ export const MultilineInput = ({
     <div
       id={id}
       ref={inputRef}
-      role="textbox"
-      contentEditable={disabled ? false : 'plaintext-only'}
+      role={readOnly ? undefined : 'textbox'}
+      contentEditable={disabled || readOnly ? false : 'plaintext-only'}
       suppressContentEditableWarning
       onKeyDown={handleKeyDown}
       className={classnames(
         className,
         'overflow-x-hidden px-1.5',
-        !disabled && 'not-focus:cursor-pointer hover:bg-gray-200',
+        !disabled && !readOnly && 'not-focus:cursor-pointer hover:bg-gray-200',
       )}
     >
       {staticInitialValue}
