@@ -1,17 +1,14 @@
 # To-do
 
 - core functionality
-  - make delete dialog relative to button
-  - make new item form consistent with items
+  - fix document scroll breaking after dialog closes
+  - add edit mode with default being tap to check off ??
+  - add label to toolbar when in different modes
   - preserve line breaks between save/read
+  - make new item form consistent with items
   - prevent data loss on browser navigation
+  - make delete dialog relative to button
   - review props (don't use element props; make each type precise)
-  - improve design & aesthetics
-  - support markdown?
-  - design & implement multiple list solution
-    - single CRDT; use list IDs
-    - kanban?
-    - drag between?
 - dnd
   - cancel on escape key
   - improve auto-scroll
@@ -37,3 +34,7 @@
   - enforce max size on client and server
   - e2e encryption
 - to-do review: go over to-dos in code
+- multi-list support
+  - single CRDT; use list IDs
+  - kanban?
+  - drag between?
