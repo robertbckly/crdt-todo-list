@@ -48,8 +48,14 @@ export const ItemCreateForm = () => {
       onSubmit={handleSubmit}
       className="flex items-center gap-2"
     >
+      {/* Hidden input kept in sync with `MultilineInput`, as it's not form-compatible */}
       <input ref={hiddenInputRef} type="hidden" name={TEXT_INPUT_NAME} />
-      <MultilineInput autoFocus disabled={disabled} onBlur={handleTextInput} />
+      <MultilineInput
+        autoFocus
+        disabled={disabled}
+        onBlur={handleTextInput}
+        className="w-full"
+      />
 
       <Button type="submit" disabled={disabled}>
         <TickIcon />
