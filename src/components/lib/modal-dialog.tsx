@@ -11,10 +11,8 @@ export const ModalDialog = ({ open, children, onClose }: Props) => {
   useEffect(() => {
     if (open) {
       dialogRef.current?.showModal();
-      document.body.style.overflow = 'hidden';
     } else {
       dialogRef.current?.close();
-      document.body.style.overflow = 'visible';
     }
   }, [open]);
 

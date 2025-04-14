@@ -1,7 +1,6 @@
 # To-do
 
 - core functionality
-  - fix document scroll breaking after dialog closes
   - add edit mode with default being tap to check off ??
   - add label to toolbar when in different modes
   - preserve line breaks between save/read
