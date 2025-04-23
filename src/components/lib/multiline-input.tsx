@@ -79,7 +79,9 @@ export const MultilineInput = ({
       className={classnames(
         className,
         'overflow-x-hidden px-1.5',
-        !disabled && !readOnly && 'not-focus:cursor-pointer hover:bg-gray-200',
+        !disabled &&
+          !readOnly &&
+          'not-focus:cursor-pointer not-focus:hover:bg-gray-200',
       )}
     >
       {staticInitialValue}

@@ -7,8 +7,8 @@ import { useDataDispatch } from '../../../../libs/data/data-context';
 import { DeleteDialog } from '../dialogs/delete-dialog';
 import { MultilineInput } from '../../../lib/multiline-input';
 import { BinIcon } from '../../../lib/icons/bin-icon';
-import { type Item as TItem } from '../../../../types/item';
 import { useMode } from '../../../../context/mode-provider';
+import { type Item as TItem } from '../../../../types/item';
 
 const TEXT_INPUT_ID = 'text';
 
@@ -63,7 +63,6 @@ export const Item = ({ index, data, disabled = false }: Props) => {
         aria-labelledby={TEXT_INPUT_ID}
         className={classnames(
           'relative flex items-center rounded-md border-transparent p-1.5 pl-0',
-          'hover:bg-gray-100',
         )}
       >
         <DragHitBox index={index} />

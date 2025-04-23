@@ -1,12 +1,10 @@
 # To-do
 
 - core functionality
-  - add label to toolbar when in different modes
   - preserve line breaks between save/read
-  - make new item form consistent with items
   - prevent data loss on browser navigation
   - make delete dialog relative to button
-  - review props (don't use element props; make each type precise)
+  - tidy props & imports (don't use element props; make each type precise)
 - dnd
   - cancel on escape key
   - improve auto-scroll

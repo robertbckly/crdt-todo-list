@@ -46,7 +46,7 @@ export const ItemCreateForm = () => {
       aria-label="Add item"
       aria-disabled={disabled}
       onSubmit={handleSubmit}
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 p-2"
     >
       {/* Hidden input kept in sync with `MultilineInput`, as it's not form-compatible */}
       <input ref={hiddenInputRef} type="hidden" name={TEXT_INPUT_NAME} />
@@ -54,7 +54,7 @@ export const ItemCreateForm = () => {
         autoFocus
         disabled={disabled}
         onBlur={handleTextInput}
-        className="w-full"
+        className="w-full rounded border"
       />
 
       <Button type="submit" disabled={disabled}>

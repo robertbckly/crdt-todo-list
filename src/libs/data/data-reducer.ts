@@ -39,9 +39,11 @@ export const dataReducer = (
     }
 
     case 'created_item': {
-      const newCrdt = structuredClone(state.crdt);
       const createdTimeMs = Date.now();
-      newCrdt.items.push({
+      const newCrdt = structuredClone(state.crdt);
+
+      // Prepend new item
+      newCrdt.items.unshift({
         id: uuid(),
         clientId,
         counter: clientCounter + 1,
@@ -51,6 +53,19 @@ export const dataReducer = (
         text: action.text,
         status: 'open',
       });
+
+      newCrdt.items = newCrdt.items.map(
+        (item, index): Item => ({
+          ...item,
+          order: index,
+          // Item must appear to be new from this client to ensure
+          // updates are picked up during other clients' merging
+          clientId,
+          counter: clientCounter + 1,
+          updatedTimeMs: Date.now(),
+        }),
+      );
+
       newCrdt.counters[clientId] = clientCounter + 1;
 
       return {
