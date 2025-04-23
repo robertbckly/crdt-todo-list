@@ -62,7 +62,7 @@ export const Item = ({ index, data, disabled = false }: Props) => {
       <li
         aria-labelledby={TEXT_INPUT_ID}
         className={classnames(
-          'relative flex items-center rounded-md border-transparent p-1.5 pl-0',
+          'relative flex items-start rounded-md border-transparent p-1.5 pl-0',
         )}
       >
         <DragHitBox index={index} />
@@ -92,7 +92,7 @@ export const Item = ({ index, data, disabled = false }: Props) => {
         </div>
 
         {/* Note: extra container needed to prevent clicking to focus outside of bounds */}
-        <div className="flex-auto">
+        <div className="flex-auto mt-1">
           <MultilineInput
             initialValue={data.text}
             readOnly={mode !== 'update'}

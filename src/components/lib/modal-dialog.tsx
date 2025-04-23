@@ -25,9 +25,9 @@ export const ModalDialog = ({ open, children, onClose }: Props) => {
   return (
     <dialog
       ref={dialogRef}
-      className="mx-auto mt-[20vh] w-full max-w-md rounded bg-transparent"
+      className="mx-auto mt-[20vh] w-full max-w-md bg-transparent"
     >
-      <div className="mx-4 bg-white shadow-lg">{children}</div>
-    </dialog>
+      <div className="mx-4 rounded bg-white shadow-lg">{children}</div>
+  </dialog>
   );
 };
