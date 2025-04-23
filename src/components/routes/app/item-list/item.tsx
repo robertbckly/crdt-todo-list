@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '../../../lib/button';
 import { classnames } from '../../../../utils/classnames';
 import { DragHandle } from '../../../../libs/drag/drag-handle';
@@ -9,8 +9,6 @@ import { MultilineInput } from '../../../lib/multiline-input';
 import { BinIcon } from '../../../lib/icons/bin-icon';
 import { useMode } from '../../../../context/mode-provider';
 import { type Item as TItem } from '../../../../types/item';
-
-const TEXT_INPUT_ID = 'text';
 
 type Props = {
   index: number;
@@ -23,6 +21,8 @@ export const Item = ({ index, data, disabled = false }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const dispatch = useDataDispatch();
   const mode = useMode();
+  const isReadOnly = disabled || mode !== 'update' || data.status === 'closed';
+  const inputId = useId();
 
   const updateText = (newText: string) => {
     dispatch?.({
@@ -60,7 +60,7 @@ export const Item = ({ index, data, disabled = false }: Props) => {
   return (
     <>
       <li
-        aria-labelledby={TEXT_INPUT_ID}
+        aria-labelledby={inputId}
         className={classnames(
           'relative flex items-start rounded-md border-transparent p-1.5 pl-0',
         )}
@@ -92,16 +92,19 @@ export const Item = ({ index, data, disabled = false }: Props) => {
         </div>
 
         {/* Note: extra container needed to prevent clicking to focus outside of bounds */}
-        <div className="flex-auto mt-1">
+        <div className="mt-1 flex-auto">
           <MultilineInput
+            itemId={data.id}
+            a11yId={inputId}
             initialValue={data.text}
-            readOnly={mode !== 'update'}
-            disabled={data.status === 'closed'}
+            isReadOnly={isReadOnly}
             onBlur={updateText}
-            id={TEXT_INPUT_ID}
             className={classnames(
-              'rounded-sm',
-              data.status === 'closed' && 'text-gray-500 line-through',
+              'rounded-sm border',
+              !isReadOnly
+                ? 'border-gray-400 not-focus:hover:bg-gray-200'
+                : 'border-transparent',
+              data.status === 'closed' && 'text-gray-400 line-through',
             )}
           />
         </div>

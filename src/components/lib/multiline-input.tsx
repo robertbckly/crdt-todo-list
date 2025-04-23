@@ -2,21 +2,21 @@ import { useEffect, useRef, useState, type ComponentProps } from 'react';
 import { classnames } from '../../utils/classnames';
 
 type Props = {
+  itemId?: string;
+  a11yId?: string;
   initialValue?: string;
   autoFocus?: boolean;
-  readOnly?: boolean;
-  disabled?: boolean;
-  id?: string;
+  isReadOnly?: boolean;
   className?: string;
   onBlur?: (value: string) => void;
 };
 
 export const MultilineInput = ({
+  itemId,
+  a11yId,
   initialValue = '',
   autoFocus = false,
-  readOnly = false,
-  disabled = false,
-  id,
+  isReadOnly = false,
   className,
   onBlur,
 }: Props) => {
@@ -60,7 +60,7 @@ export const MultilineInput = ({
   }, [onBlur]);
 
   const handleKeyDown: ComponentProps<'div'>['onKeyDown'] = (e) => {
-    if (disabled) return;
+    if (isReadOnly) return;
     const isSubmitShortcut = e.metaKey && e.key === 'Enter';
 
     if (isSubmitShortcut || e.key === 'Escape') {
@@ -70,35 +70,35 @@ export const MultilineInput = ({
 
   return (
     <div
-      id={id}
+      id={a11yId}
       ref={inputRef}
-      role={readOnly ? undefined : 'textbox'}
-      contentEditable={disabled || readOnly ? false : 'plaintext-only'}
+      role={isReadOnly ? undefined : 'textbox'}
+      contentEditable={isReadOnly ? false : 'plaintext-only'}
       suppressContentEditableWarning
       onKeyDown={handleKeyDown}
       className={classnames(
         className,
         'overflow-x-hidden px-1.5',
-        !disabled &&
-          !readOnly &&
-          'not-focus:cursor-pointer not-focus:hover:bg-gray-200',
+        !isReadOnly && 'not-focus:cursor-pointer',
       )}
     >
       {staticInitialValue &&
-        staticInitialValue.split('\n').map((textSegment, index, array) => {
-          // Note: it's impossible to avoid using the `index` in the key when
-          // uniquely identifying each line, but any issues *should* be resolved
-          // by including the text segment itself (i.e. can't foresee a bug from
-          // having the same text in the same position in the same item)
-          const key = `${id}-${textSegment}-${index}`;
-          const isLastSegment = index === array.length - 1;
+        staticInitialValue
+          .split('\n')
+          .map((lineString, lineIndex, arrayOfLines) => {
+            // Note: it's impossible to avoid using the `index` in the key when
+            // uniquely identifying each line, but any issues *should* be resolved
+            // by including the text segment itself (i.e. can't foresee a bug from
+            // having the same text in the same position in the same item)
+            const key = `${itemId}-${lineString}-${lineIndex}`;
+            const isLastSegment = lineIndex === arrayOfLines.length - 1;
 
-          if (!textSegment.length && !isLastSegment) {
-            return <br key={key} />;
-          } else {
-            return <p key={key}>{textSegment}</p>;
-          }
-        })}
+            if (!lineString.length && !isLastSegment) {
+              return <br key={key} />;
+            } else {
+              return <p key={key}>{lineString}</p>;
+            }
+          })}
     </div>
   );
 };
