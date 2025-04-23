@@ -3,6 +3,7 @@ import { AddIcon } from '../../../../lib/icons/add-icon';
 import { BinIcon } from '../../../../lib/icons/bin-icon';
 import { EditIcon } from '../../../../lib/icons/edit-icon';
 import { OrderIcon } from '../../../../lib/icons/order-icon';
+import { SyncButton } from '../sync-button/sync-button';
 import { ToolbarButton } from '../toolbar-button';
 
 export const DefaultMode = () => {
@@ -24,6 +25,8 @@ export const DefaultMode = () => {
       <ToolbarButton name="Enter delete-mode" onClick={() => setMode('delete')}>
         <BinIcon />
       </ToolbarButton>
+
+      <SyncButton />
     </div>
   );
 };

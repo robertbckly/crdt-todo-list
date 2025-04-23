@@ -11,6 +11,10 @@ type Params = {
   dispatch: DataDispatch;
 };
 
+/**
+ * Automatically configures remote sync if the user has
+ * logged in and established cookies
+ */
 export const useRemoteSync = ({ dataState, dispatch }: Params) => {
   const csrfToken = useCsrfToken();
   const isReady = !!csrfToken;

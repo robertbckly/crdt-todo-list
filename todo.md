@@ -1,9 +1,9 @@
 # To-do
 
 - core functionality
-  - preserve line breaks between save/read
+  - fix multi-line-input static value not updating after sync
+  - add sync scheduling
   - prevent data loss on browser navigation
-  - make delete dialog relative to button
   - tidy props & imports (don't use element props; make each type precise)
 - dnd
   - cancel on escape key
