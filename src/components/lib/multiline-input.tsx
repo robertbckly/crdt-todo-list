@@ -84,7 +84,21 @@ export const MultilineInput = ({
           'not-focus:cursor-pointer not-focus:hover:bg-gray-200',
       )}
     >
-      {staticInitialValue}
+      {staticInitialValue &&
+        staticInitialValue.split('\n').map((textSegment, index, array) => {
+          // Note: it's impossible to avoid using the `index` in the key when
+          // uniquely identifying each line, but any issues *should* be resolved
+          // by including the text segment itself (i.e. can't foresee a bug from
+          // having the same text in the same position in the same item)
+          const key = `${id}-${textSegment}-${index}`;
+          const isLastSegment = index === array.length - 1;
+
+          if (!textSegment.length && !isLastSegment) {
+            return <br key={key} />;
+          } else {
+            return <p key={key}>{textSegment}</p>;
+          }
+        })}
     </div>
   );
 };
