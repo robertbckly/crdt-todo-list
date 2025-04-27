@@ -1,6 +1,6 @@
 # CRDT To-Do List
 
-Simple React to-do list app with a twist:
+[Work in progress] simple React to-do list app with a twist:
 
 I implemented my interpretation of 'Optimised OR-Set': a data structured described in [this research paper](https://arxiv.org/abs/1210.3368). It's a form of 'conflict-free replicated data type' (CRDT) that, in this case, allows to-do lists to be replicated across devices, updated concurrently and achieve eventual consistency without conflicts.
 
